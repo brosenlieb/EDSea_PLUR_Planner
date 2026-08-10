@@ -1,31 +1,85 @@
 import os
-from dotenv import load_dotenv
+import json
 import random
+import traceback
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-# Import the models we just created
+# Import the models
 from backend.app.db.models import Base, Stage, Artist, Performance, StageDistance
 
 load_dotenv()
-# Connect to the local Postgres container we spun up in docker-compose
 DATABASE_URL = os.getenv("DB_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in environment or .env file!")
+
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# --- CONFIGURATION ---
+# Change this to the timezone where the festival actually takes place
+SOURCE_TIMEZONE = "America/New_York" 
+
+SCHEDULE_FILES = [
+    {"file": "data/raw/day1.json", "date": "2025-11-01"},
+    {"file": "data/raw/day2.json", "date": "2025-11-02"},
+    {"file": "data/raw/day3.json", "date": "2025-11-03"},
+    {"file": "data/raw/day4.json", "date": "2025-11-04"},
+    {"file": "data/raw/day5.json", "date": "2025-11-05"},
+]
+
+def sanitize_value(val, fallback):
+    """Checks for null, 'all', or empty strings and applies a safe fallback."""
+    if not val:
+        return fallback
+    clean_val = str(val).strip()
+    if clean_val.lower() in ["null", "all", "none", "n/a", ""]:
+        return fallback
+    return clean_val
+
+def parse_to_utc(date_str: str, time_str: str) -> datetime:
+    """
+    Parses a date and time string using 24-hour format, 
+    localizes it to SOURCE_TIMEZONE, and converts it to UTC.
+    
+    Args:
+        date_str: Date in "YYYY-MM-DD" format.
+        time_str: Time in "HH:MM" (24-hour) format.
+        
+    Returns:
+        A timezone-aware datetime object in UTC.
+    """
+    # Clean the time string (remove spaces, extra zeros, and normalize)
+    normalized_time = time_str.strip().replace(" ", "").upper()
+    # Converts to a 24-hr datetime object
+    clean_time = datetime.strptime(normalized_time, "%I:%M%p")
+    # Shift clean_time back to a string with only five characters: HH:MM
+    clean_time = datetime.strftime(clean_time, "%I:%M")[:5]
+
+    combined_str = f"{date_str} {clean_time}"
+    
+    try:
+        # Use %H:%M for 24-hour clock
+        naive_dt = datetime.strptime(combined_str, "%Y-%m-%d %H:%M")
+    except ValueError as e:
+        # Fallback/Error handling for unexpected formats
+        raise ValueError(f"Time '{clean_time}' is not in valid 24-hour HH:MM format: {e}")
+
+    # 1. Attach the local festival timezone (e.g., America/New_York)
+    # 2. Convert that local time to UTC
+    local_dt = naive_dt.replace(tzinfo=ZoneInfo(SOURCE_TIMEZONE))
+    return local_dt.astimezone(timezone.utc)
 
 def seed_database():
     print("Connecting to database...")
     
-    # 1. Enable pgvector extension dynamically
     with engine.connect() as conn:
-        # prevents having to recreate the Docker container for initialization
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         conn.commit()
 
-    # 2. Clear existing data and create tables
     print("Creating tables...")
     Base.metadata.drop_all(bind=engine) 
     Base.metadata.create_all(bind=engine)
@@ -33,77 +87,109 @@ def seed_database():
     session = SessionLocal()
 
     try:
-        # 3. Seed Stages
-        print("Seeding stages...")
-        stages_data = ["Main Stage", "Forest Stage", "Neon Tent"]
-        stages = []
-        for name in stages_data:
-            stage = Stage(name=name)
-            session.add(stage)
-            stages.append(stage)
-        session.commit()
+        print("Reading JSON files...")
+        all_events = []
+        for sf in SCHEDULE_FILES:
+            try:
+                with open(sf["file"], 'r') as f:
+                    data = json.load(f)
+                    events = data.get("performances", data) if isinstance(data, dict) else data
+                    
+                    for event in events:
+                        event['festival_date'] = sf['date']
+                        all_events.append(event)
+            except FileNotFoundError:
+                print(f"Warning: {sf['file']} not found. Skipping.")
 
-        # 4. Seed Stage Distances (Travel Matrix)
-        print("Seeding travel matrix...")
-        # (Stage A index, Stage B index, Walk time in minutes)
-        distances = [
-            (0, 1, 10), # Main to Forest: 10 mins
-            (0, 2, 15), # Main to Neon: 15 mins
-            (1, 2, 5),  # Forest to Neon: 5 mins
-        ]
+        if not all_events:
+            print("No event data found. Exiting.")
+            return
+
+        print("Sanitizing and extracting entities...")
+        unique_stages = set()
+        unique_artist_names = set()
         
-        for a_idx, b_idx, dist in distances:
-            # We add both directions to make routing queries easier later
-            session.add(StageDistance(stage_a_id=stages[a_idx].id, stage_b_id=stages[b_idx].id, distance_minutes=dist))
-            session.add(StageDistance(stage_a_id=stages[b_idx].id, stage_b_id=stages[a_idx].id, distance_minutes=dist))
-        session.commit()
+        for e in all_events:
+            raw_stage = e.get("stage")
+            raw_location = e.get("location")
+            
+            e["clean_stage"] = sanitize_value(raw_stage, fallback="Festival Wide")
+            e["clean_location"] = sanitize_value(raw_location, fallback="General Area")
+            
+            stage_key = (e["clean_stage"], e["clean_location"])
+            e["stage_key"] = stage_key
+            unique_stages.add(stage_key)
+            
+            raw_event = e.get("event")
+            e["clean_artist"] = sanitize_value(raw_event, fallback="General Announcement")
+            unique_artist_names.add(e["clean_artist"])
 
-        # 5. Seed Artists with dummy vector embeddings
-        print("Seeding artists...")
-        artist_names = [
-            "Neon Dreams", "Electric Horizon", "Bass Drop Brigade", "The Melody Makers",
-            "Synthwave Surfers", "Acoustic Sunset", "Midnight Rhythms", "DJ Phantom",
-            "The Underground", "Cosmic Groove"
-        ]
-        artists = []
-        for name in artist_names:
-            # Generate a random 384-dimensional float array to simulate an AI embedding
+        print(f"Seeding {len(unique_stages)} stages...")
+        stages_dict = {}
+        for stage_name, location_name in unique_stages:
+            stage = Stage(name=stage_name, location_name=location_name)
+            session.add(stage)
+            session.flush()
+            stages_dict[(stage_name, location_name)] = stage
+
+        print(f"Seeding {len(unique_artist_names)} artists/events...")
+        artists_dict = {}
+        for name in unique_artist_names:
             dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(384)]
             
             artist = Artist(
                 name=name,
-                genre="Electronic", 
-                description=f"A mind-bending performance by {name}.",
+                genre="Unknown",
+                description=f"Event/Performance: {name}",
                 embedding=dummy_embedding
             )
             session.add(artist)
-            artists.append(artist)
+            session.flush()
+            artists_dict[name] = artist
+            
         session.commit()
 
-        # 6. Seed Performances (Overlapping schedules to test OR-Tools later)
         print("Seeding performances...")
-        festival_start = datetime(2026, 8, 15, 17, 0, tzinfo=timezone.utc)
+        current_event = None
         
-        for i, artist in enumerate(artists):
-            # Assign stages cyclically and create some overlapping times
-            stage = stages[i % 3]
-            start_time = festival_start + timedelta(hours=(i // 3))
-            end_time = start_time + timedelta(minutes=45)
+        for e in all_events:
+            current_event = e
             
-            performance = Performance(
-                artist_id=artist.id,
-                stage_id=stage.id,
-                start_time=start_time,
-                end_time=end_time
-            )
-            session.add(performance)
-        session.commit()
-        
-        print("Database successfully seeded.")
-        
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        session.rollback()
+            try:
+                # Convert start time to UTC
+                start_dt = parse_to_utc(e['festival_date'], e['start_time'])
+                
+                # Handle End Time
+                end_time_raw = e.get('end_time')
+                if end_time_raw and str(end_time_raw).strip().lower() not in ["null", "none", "", "n/a"]:
+                    end_dt = parse_to_utc(e['festival_date'], str(end_time_raw))
+                    
+                    # Midnight rollover check: If end is before start, it's the next day
+                    if end_dt <= start_dt:
+                        end_dt += timedelta(days=1)
+                else:
+                    # Default to 15 minutes after start time
+                    end_dt = start_dt + timedelta(minutes=15)
+                
+                performance = Performance(
+                    artist_id=artists_dict[e['clean_artist']].id,
+                    stage_id=stages_dict[e['stage_key']].id,
+                    start_time=start_dt,
+                    end_time=end_dt
+                )
+                session.add(performance)
+                
+            except (ValueError, KeyError) as ve:
+                print(f"Skipping event '{e.get('clean_artist', 'Unknown')}' due to error: {ve}. See {current_event}")
+                continue
+            
+        try:
+            session.commit()
+            print("Database successfully seeded with UTC times.")
+        except Exception as e:
+            session.rollback()
+            print(f"Error occurred during: {current_event}\n{traceback.format_exc()}")
+            raise 
     finally:
         session.close()
 

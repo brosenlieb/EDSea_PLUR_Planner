@@ -1,0 +1,338 @@
+[
+  {
+    "event": "BAGGI",
+    "start_time": "3:45PM",
+    "end_time": "5:30PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "PAUZA",
+    "start_time": "5:30PM",
+    "end_time": "7:15PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "MARSH",
+    "start_time": "7:15PM",
+    "end_time": "8:45PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "TOM & COLLINS",
+    "start_time": "8:45PM",
+    "end_time": "10:15PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "ŁASZEWO",
+    "start_time": "10:15PM",
+    "end_time": "11:45PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "LP GIOBBI",
+    "start_time": "11:45PM",
+    "end_time": "1:15AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "ALOK",
+    "start_time": "1:15AM",
+    "end_time": "2:45AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "DEORRO",
+    "start_time": "2:45AM",
+    "end_time": "4:15AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
+    "day_num": "2"
+  },
+  {
+    "event": "JON CASEY",
+    "start_time": "9:00PM",
+    "end_time": "10:30PM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING DECK 7 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "YDG",
+    "start_time": "10:30PM",
+    "end_time": "12:00AM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING DECK 7 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "LIQUID STRANGER",
+    "start_time": "12:00AM",
+    "end_time": "1:00AM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING DECK 7 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "ISOXO",
+    "start_time": "1:00AM",
+    "end_time": "2:15AM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING DECK 7 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "ZORZA",
+    "start_time": "7:30PM",
+    "end_time": "9:30PM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "CLARA CUVÉ",
+    "start_time": "9:30PM",
+    "end_time": "11:30PM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "CERA KHIN",
+    "start_time": "11:30PM",
+    "end_time": "1:30AM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "OGUZ",
+    "start_time": "1:30AM",
+    "end_time": "3:30AM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT",
+    "day_num": "2"
+  },
+  {
+    "event": "MOR • A • MOR",
+    "start_time": "9:15PM",
+    "end_time": "10:45PM",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD",
+    "day_num": "2"
+  },
+  {
+    "event": "NOIZU",
+    "start_time": "10:45PM",
+    "end_time": "12:15AM",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD",
+    "day_num": "2"
+  },
+  {
+    "event": "SIDEPIECE",
+    "start_time": "12:15AM",
+    "end_time": "1:45AM",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD",
+    "day_num": "2"
+  },
+  {
+    "event": "TROUBLE",
+    "start_time": "12:30PM",
+    "end_time": "1:45PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "BROSA",
+    "start_time": "1:45PM",
+    "end_time": "3:15PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "EDEN PRINCE",
+    "start_time": "3:15PM",
+    "end_time": "4:45PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "ARDALAN",
+    "start_time": "4:45PM",
+    "end_time": "6:15PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "BOLO",
+    "start_time": "6:15PM",
+    "end_time": "7:45PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "IT'S MURPH",
+    "start_time": "7:45PM",
+    "end_time": "9:15PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "KIAN",
+    "start_time": "9:00PM",
+    "end_time": "10:30PM",
+    "stage": "DEEP DIVE DISCO",
+    "location": "THE SOCIAL DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "MCLOV3N",
+    "start_time": "10:30PM",
+    "end_time": "12:00AM",
+    "stage": "DEEP DIVE DISCO",
+    "location": "THE SOCIAL DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "AMENTI",
+    "start_time": "12:00AM",
+    "end_time": "1:15AM",
+    "stage": "DEEP DIVE DISCO",
+    "location": "THE SOCIAL DECK 6 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "MANGU",
+    "start_time": "11:30PM",
+    "end_time": "12:30AM",
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "DJ HAZEL",
+    "start_time": "12:30AM",
+    "end_time": "1:45AM",
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID",
+    "day_num": "2"
+  },
+  {
+    "event": "CARTOONS + CEREAL BAR (THE PEARL)",
+    "start_time": "10:00AM",
+    "end_time": "12:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "CHARACTER BRUNCH EGGSTRAVAGANZA (TASTE&SAVOR)",
+    "start_time": "11:00AM",
+    "end_time": "2:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "BACARDÍ RAVE BINGO (CIRCUIT WAVES)",
+    "start_time": "2:00PM",
+    "end_time": "3:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "UP TO DATE (CIRCUIT WAVES)",
+    "start_time": "5:00PM",
+    "end_time": "6:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "OPEN DECK SIGN UPS (CASINO)",
+    "start_time": "7:30PM",
+    "end_time": "7:30PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "OPEN DECK (CASINO)",
+    "start_time": "8:00PM",
+    "end_time": "10:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "RISE + RADIATE YOGA (KINETIC OCEAN)",
+    "start_time": "10:00AM",
+    "end_time": "11:00AM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "RAVERCISE (KINETIC OCEAN)",
+    "start_time": "11:00AM",
+    "end_time": "12:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "SOUND HEALING (COSMIC CORAL)",
+    "start_time": "1:00PM",
+    "end_time": "2:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "DEEP CORE, DEEPER BEATS YOGA (COSMIC CORAL)",
+    "start_time": "3:00PM",
+    "end_time": "4:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "LAUGHS AHOY! COMEDY (DEEP DIVE DISCO)",
+    "start_time": "4:00PM",
+    "end_time": "5:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  },
+  {
+    "event": "LAUGHS AHOY! COMEDY (DEEP DIVE DISCO)",
+    "start_time": "7:00PM",
+    "end_time": "8:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "OTHER",
+    "day_num": "2"
+  }
+]

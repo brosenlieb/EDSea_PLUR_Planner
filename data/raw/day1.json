@@ -1,0 +1,289 @@
+[
+  {
+    "location_name": "all",
+    "stage_name": null,
+    "artist_name": "SAFETY MESSAGING",
+    "start_time": "4:30PM",
+    "end_time": "5:30PM"
+  },
+  {
+    "location_name": "all",
+    "stage_name": null,
+    "artist_name": "SAIL AWAY FROM MIAMI",
+    "start_time": "8:00PM",
+    "end_time": "8:15PM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "NITTI",
+    "start_time": "5:30PM",
+    "end_time": "7:00PM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "NOIZU",
+    "start_time": "7:00PM",
+    "end_time": "8:30PM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "WESTEND",
+    "start_time": "8:30PM",
+    "end_time": "10:00PM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "IT'S MURPH",
+    "start_time": "10:00PM",
+    "end_time": "11:30PM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "SIDEPIECE",
+    "start_time": "11:30PM",
+    "end_time": "1:00AM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "TOKIMONSTA",
+    "start_time": "1:00AM",
+    "end_time": "2:30AM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "ISOXO",
+    "start_time": "2:30AM",
+    "end_time": "3:45AM"
+  },
+  {
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "Kinetic Ocean",
+    "artist_name": "DR. FRESCH",
+    "start_time": "3:45AM",
+    "end_time": "5:15AM"
+  },
+  {
+    "location_name": "Manhattan Dining Deck 7 AFT",
+    "stage_name": "Cosmic Coral",
+    "artist_name": "CHEF BOYARBEATZ",
+    "start_time": "12:30AM",
+    "end_time": "1:45AM"
+  },
+  {
+    "location_name": "Manhattan Dining Deck 7 AFT",
+    "stage_name": "Cosmic Coral",
+    "artist_name": "DEORRO",
+    "start_time": "1:45AM",
+    "end_time": "3:15AM"
+  },
+  {
+    "location_name": "Manhattan Dining Deck 7 AFT",
+    "stage_name": "Cosmic Coral",
+    "artist_name": "BOLO",
+    "start_time": "3:15AM",
+    "end_time": "4:45AM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "EDEN PRINCE",
+    "start_time": "7:45PM",
+    "end_time": "9:15PM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "KINAHAU",
+    "start_time": "9:15PM",
+    "end_time": "10:45PM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "OMRI.",
+    "start_time": "10:45PM",
+    "end_time": "12:15AM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "JOSH BUTLER",
+    "start_time": "12:15AM",
+    "end_time": "1:45AM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "ARMAND VAN HELDEN",
+    "start_time": "1:45AM",
+    "end_time": "3:15AM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "OMNOM",
+    "start_time": "3:15AM",
+    "end_time": "4:45AM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "LAYTON GIORDANI",
+    "start_time": "4:45AM",
+    "end_time": "6:15AM"
+  },
+  {
+    "location_name": "Spice H2O Deck 17 AFT",
+    "stage_name": "Neon Splash",
+    "artist_name": "TOM & COLLINS",
+    "start_time": "6:15AM",
+    "end_time": "7:30AM"
+  },
+  {
+    "location_name": "Joy Theater Deck 7 FWD",
+    "stage_name": "Circuit Waves",
+    "artist_name": "MARSH",
+    "start_time": "10:00PM",
+    "end_time": "11:45PM"
+  },
+  {
+    "location_name": "Joy Theater Deck 7 FWD",
+    "stage_name": "Circuit Waves",
+    "artist_name": "JERRO",
+    "start_time": "11:45PM",
+    "end_time": "1:15AM"
+  },
+  {
+    "location_name": "Joy Theater Deck 7 FWD",
+    "stage_name": "Circuit Waves",
+    "artist_name": "ALOK PRESENTS: SOMETHING ELSE",
+    "start_time": "1:15AM",
+    "end_time": "2:45AM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "TROUBLE",
+    "start_time": "2:00PM",
+    "end_time": "3:30PM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "SHAPESHFTR",
+    "start_time": "3:30PM",
+    "end_time": "4:45PM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "MADHAUS (MADDY O'NEAL HOUSE SET)",
+    "start_time": "5:30PM",
+    "end_time": "7:00PM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "LAYZ SABRITAZ HOUSE SET",
+    "start_time": "7:00PM",
+    "end_time": "8:30PM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "PLAYER DAVE",
+    "start_time": "8:30PM",
+    "end_time": "9:45PM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "CHYL",
+    "start_time": "9:45PM",
+    "end_time": "11:00PM"
+  },
+  {
+    "location_name": "Atrium Deck 6 MID",
+    "stage_name": "The Pearl",
+    "artist_name": "JUELZ",
+    "start_time": "11:00PM",
+    "end_time": "12:15AM"
+  },
+  {
+    "location_name": "The Cavern Deck 8 MID",
+    "stage_name": "Rave Cave",
+    "artist_name": "CLARA CUVÉ",
+    "start_time": "12:00AM",
+    "end_time": "1:45AM"
+  },
+  {
+    "location_name": "The Cavern Deck 8 MID",
+    "stage_name": "Rave Cave",
+    "artist_name": "OGUZ",
+    "start_time": "1:45AM",
+    "end_time": "3:45AM"
+  },
+  {
+    "location_name": "The Cavern Deck 8 MID",
+    "stage_name": "Rave Cave",
+    "artist_name": "CERA KHIN",
+    "start_time": "3:45AM",
+    "end_time": "5:45AM"
+  },
+  {
+    "location_name": "The Social Deck 6 MID",
+    "stage_name": "Deep Dive Disco",
+    "artist_name": "ZEN SELEKTA",
+    "start_time": "9:00PM",
+    "end_time": "10:30PM"
+  },
+  {
+    "location_name": "The Social Deck 6 MID",
+    "stage_name": "Deep Dive Disco",
+    "artist_name": "SOTA",
+    "start_time": "10:30PM",
+    "end_time": "11:30PM"
+  },
+  {
+    "location_name": "Casino Deck 7 MID",
+    "stage_name": "Kandi Casino",
+    "artist_name": "ALEX JAY",
+    "start_time": "11:00PM",
+    "end_time": "12:30AM"
+  },
+  {
+    "location_name": "Casino Deck 7 MID",
+    "stage_name": "Kandi Casino",
+    "artist_name": "KIAN",
+    "start_time": "12:30AM",
+    "end_time": "2:00AM"
+  },
+  {
+    "location_name": "Other",
+    "stage_name": "Misc Activities",
+    "artist_name": "CONVOY CONNECTIONS (THE NEST)",
+    "start_time": "2:00PM",
+    "end_time": "5:00PM"
+  },
+  {
+    "location_name": "Other",
+    "stage_name": "Misc Activities",
+    "artist_name": "WELCOME HOME TOAST W/ BACARDÍ (KINETIC OCEAN)",
+    "start_time": "5:15PM",
+    "end_time": "5:30PM"
+  },
+  {
+    "location_name": "Other",
+    "stage_name": "Misc Activities",
+    "artist_name": "MERCH STORE OPENS (OBSERVATION LOUNGE)",
+    "start_time": "9:00PM",
+    "end_time": "9:15PM"
+  }
+]

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, UniqueConstraint
 from sqlalchemy.orm import declarative_base, relationship
 from pgvector.sqlalchemy import Vector
 
@@ -8,7 +8,13 @@ class Stage(Base):
     __tablename__ = 'stages'
     
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
+    location_name = Column(String, index=True)
+    
+    # Ensures the combination of stage name and location is unique
+    __table_args__ = (
+        UniqueConstraint('name', 'location_name', name='uq_stage_name_location'),
+    )
     
     performances = relationship("Performance", back_populates="stage")
 

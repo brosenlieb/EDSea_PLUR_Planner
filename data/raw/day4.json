@@ -1,0 +1,338 @@
+[
+  {
+    "day_num": "4",
+    "artist": "MOR • A • MOR",
+    "start_time": "4:00PM",
+    "end_time": "5:30PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "ARDALAN",
+    "start_time": "5:30PM",
+    "end_time": "7:15PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "EDEN PRINCE",
+    "start_time": "7:15PM",
+    "end_time": "9:00PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "DOMBRESKY",
+    "start_time": "9:00PM",
+    "end_time": "10:30PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "LIQUID STRANGER",
+    "start_time": "10:30PM",
+    "end_time": "11:30PM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "DIMENSION",
+    "start_time": "11:30PM",
+    "end_time": "12:45AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "SARA LANDRY",
+    "start_time": "12:45AM",
+    "end_time": "2:45AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "SHLØMO",
+    "start_time": "2:45AM",
+    "end_time": "4:45AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "ALIGNMENT",
+    "start_time": "4:45AM",
+    "end_time": "6:30AM",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
+  },
+  {
+    "day_num": "4",
+    "artist": "NIKITA, THE WICKED",
+    "start_time": "9:00PM",
+    "end_time": "10:30PM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING ROOM DECK 7 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "YDG",
+    "start_time": "10:30PM",
+    "end_time": "11:45PM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING ROOM DECK 7 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "ALLEYCVT",
+    "start_time": "11:45PM",
+    "end_time": "1:00AM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING ROOM DECK 7 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "MERSIV",
+    "start_time": "1:00AM",
+    "end_time": "2:15AM",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING ROOM DECK 7 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "PAUZA",
+    "start_time": "8:00PM",
+    "end_time": "9:45PM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "LUCH",
+    "start_time": "9:45PM",
+    "end_time": "11:15PM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "VINTAGE CULTURE",
+    "start_time": "11:15PM",
+    "end_time": "12:45AM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "AMÉMÉ B2B MAZ",
+    "start_time": "12:45AM",
+    "end_time": "3:00AM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "WESTEND",
+    "start_time": "3:00AM",
+    "end_time": "5:00AM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "AYYBO",
+    "start_time": "5:00AM",
+    "end_time": "7:00AM",
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
+  },
+  {
+    "day_num": "4",
+    "artist": "ROCKE",
+    "start_time": "10:30PM",
+    "end_time": "12:00AM",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD"
+  },
+  {
+    "day_num": "4",
+    "artist": "TOKiMONSTA",
+    "start_time": "12:00AM",
+    "end_time": "1:30AM",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD"
+  },
+  {
+    "day_num": "4",
+    "artist": "MALAA'S ALTER EGO",
+    "start_time": "1:30AM",
+    "end_time": "3:00AM",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD"
+  },
+  {
+    "day_num": "4",
+    "artist": "SHAPESHFTR",
+    "start_time": "4:30PM",
+    "end_time": "5:45PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "BROSA",
+    "start_time": "5:45PM",
+    "end_time": "7:00PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "ŁASZEWO",
+    "start_time": "7:00PM",
+    "end_time": "8:15PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "R3HAB (BASSMENT SESSION)",
+    "start_time": "8:15PM",
+    "end_time": "9:30PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "LOUD LUXURY",
+    "start_time": "9:30PM",
+    "end_time": "10:45PM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "GALANTIS",
+    "start_time": "10:45PM",
+    "end_time": "12:00AM",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "PLAYER DAVE",
+    "start_time": "12:00AM",
+    "end_time": "1:15AM",
+    "stage": "RAVE CAVE",
+    "location": "THE CAVERN DECK 8 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "MORGAN SEATREE",
+    "start_time": "1:15AM",
+    "end_time": "2:30AM",
+    "stage": "RAVE CAVE",
+    "location": "THE CAVERN DECK 8 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "RIORDAN",
+    "start_time": "2:30AM",
+    "end_time": "4:00AM",
+    "stage": "RAVE CAVE",
+    "location": "THE CAVERN DECK 8 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "ALEXJAY B2B MCLOV3N",
+    "start_time": "5:30PM",
+    "end_time": "7:00PM",
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "JENNA SHAW",
+    "start_time": "7:00PM",
+    "end_time": "8:30PM",
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "CHARACTER BRUNCH EGGSTRAVAGANZA",
+    "start_time": "11:00AM",
+    "end_time": "2:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "TASTE&SAVOR"
+  },
+  {
+    "day_num": "4",
+    "artist": "3-TIMERS ONLY EDSEA OG APPRECIATION PARTY",
+    "start_time": "3:00PM",
+    "end_time": "4:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "NEON SPLASH"
+  },
+  {
+    "day_num": "4",
+    "artist": "LAUGHS AHOY! COMEDY",
+    "start_time": "4:00PM",
+    "end_time": "5:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "DEEP DIVE DISCO"
+  },
+  {
+    "day_num": "4",
+    "artist": "RAVE FAM FEUD",
+    "start_time": "7:00PM",
+    "end_time": "8:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "CIRCUIT WAVES"
+  },
+  {
+    "day_num": "4",
+    "artist": "LOFI STRETCH + SONIC SOOTHE YOGA",
+    "start_time": "11:00AM",
+    "end_time": "12:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "KINETIC OCEAN"
+  },
+  {
+    "day_num": "4",
+    "artist": "SHUFFLE CLASS",
+    "start_time": "2:00PM",
+    "end_time": "3:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "KINETIC OCEAN"
+  },
+  {
+    "day_num": "4",
+    "artist": "SOUND HEALING",
+    "start_time": "7:00PM",
+    "end_time": "8:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "COSMIC CORAL"
+  },
+  {
+    "day_num": "4",
+    "artist": "OPEN DECK SIGN UPS",
+    "start_time": "8:30PM",
+    "end_time": null,
+    "stage": "MISC ACTIVITIES",
+    "location": "CASINO"
+  },
+  {
+    "day_num": "4",
+    "artist": "OPEN DECK",
+    "start_time": "9:00PM",
+    "end_time": "11:00PM",
+    "stage": "MISC ACTIVITIES",
+    "location": "CASINO"
+  }
+]
