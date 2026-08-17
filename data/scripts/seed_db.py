@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import random
 import traceback
@@ -7,6 +8,11 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+from pathlib import Path
+
+# Automatically locate project root (2 levels up from data/scripts/seed_db.py)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
 
 # Import the models
 from backend.app.db.models import Base, Stage, Artist, Performance, StageDistance
@@ -135,7 +141,7 @@ def seed_database():
         print(f"Seeding {len(unique_artist_names)} artists/events...")
         artists_dict = {}
         for name in unique_artist_names:
-            dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(384)]
+            dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(768)]
             
             artist = Artist(
                 name=name,

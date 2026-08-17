@@ -26,10 +26,10 @@ class Artist(Base):
     name = Column(String, index=True)
     genre = Column(String)
     description = Column(String)
-    
-    # 384 dimensions is standard for lightweight local embedding models
-    # may increase to 768 if using nomic instead
-    embedding = Column(Vector(384))
+
+    # 768-dimensions using Nomic 1.5.  Small list size should not present
+    # any computational concerns compared to 384-dimensions.
+    embedding = Column(Vector(768))
     
     performances = relationship("Performance", back_populates="artist")
 
