@@ -3,7 +3,7 @@ import sys
 import json
 import random
 import traceback
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
@@ -46,38 +46,42 @@ def sanitize_value(val, fallback):
         return fallback
     return clean_val
 
-def parse_to_utc(date_str: str, time_str: str) -> datetime:
+def parse_local_datetime(date_str: str, time_str: str) -> datetime:
     """
-    Parses a date and time string using 24-hour format, 
-    localizes it to SOURCE_TIMEZONE, and converts it to UTC.
-    
+    Parses a date and time string, normalizes it to a 24-hour format,
+    and returns a timezone-aware datetime object in the local festival timezone.
     Args:
         date_str: Date in "YYYY-MM-DD" format.
-        time_str: Time in "HH:MM" (24-hour) format.
+        time_str: Time in "HH:MM" (24-hour) or "H:MM AM/PM" format.
         
     Returns:
-        A timezone-aware datetime object in UTC.
+        A timezone-aware datetime object in SOURCE_TIMEZONE.
     """
-    # Clean the time string (remove spaces, extra zeros, and normalize)
+    # Clean input: " 2:30 PM " -> "2:30PM"
     normalized_time = time_str.strip().replace(" ", "").upper()
-    # Converts to a 24-hr datetime object
-    clean_time = datetime.strptime(normalized_time, "%I:%M%p")
-    # Shift clean_time back to a string with only five characters: HH:MM
-    clean_time = datetime.strftime(clean_time, "%I:%M")[:5]
 
+    # Determine if input is 12-hour (contains AM/PM) or 24-hour
+    if "AM" in normalized_time or "PM" in normalized_time:
+        # Parse 12-hour format
+        temp_dt = datetime.strptime(normalized_time, "%I:%M%p")
+        # Convert to a 24-hour string: "2:30 PM" -> "14:30"
+        clean_time = temp_dt.strftime("%H:%M")
+    else:
+        # Assume 24-hour format, ensure "H:MM" becomes "HH:MM"
+        clean_time = normalized_time
+        if len(clean_time) == 4:
+            clean_time = f"0{clean_time}"
     combined_str = f"{date_str} {clean_time}"
     
     try:
-        # Use %H:%M for 24-hour clock
+        # Parse into a naive datetime object
         naive_dt = datetime.strptime(combined_str, "%Y-%m-%d %H:%M")
     except ValueError as e:
-        # Fallback/Error handling for unexpected formats
-        raise ValueError(f"Time '{clean_time}' is not in valid 24-hour HH:MM format: {e}")
+        raise ValueError(f"Time '{combined_str}' is not in a valid format: {e}")
 
-    # 1. Attach the local festival timezone (e.g., America/New_York)
-    # 2. Convert that local time to UTC
-    local_dt = naive_dt.replace(tzinfo=ZoneInfo(SOURCE_TIMEZONE))
-    return local_dt.astimezone(timezone.utc)
+    # Attach the local festival timezone without converting to UTC
+    # UTC conversion may be added back later depending on 2027 data
+    return naive_dt.replace(tzinfo=ZoneInfo(SOURCE_TIMEZONE))
 
 def seed_database():
     print("Connecting to database...")
@@ -112,43 +116,78 @@ def seed_database():
             return
 
         print("Sanitizing and extracting entities...")
-        unique_stages = set()
         unique_artist_names = set()
+        # Map normalized keys (lowercase) to the Stage objects
+        # Key format: (normalized_stage_name, normalized_location_name)
+        stages_map = {}
         
         for e in all_events:
             raw_stage = e.get("stage")
             raw_location = e.get("location")
             
-            e["clean_stage"] = sanitize_value(raw_stage, fallback="Festival Wide")
-            e["clean_location"] = sanitize_value(raw_location, fallback="General Area")
+            # Clean values for display/storage
+            clean_stage = sanitize_value(raw_stage, fallback="Festival Wide").title()
+            clean_location = sanitize_value(raw_location, fallback="General Area").title()
+
+            #Specific edits for a few edge cases.  May not apply to 2027 data.
+            if clean_location == "Manhattan Dining Deck 7 Aft":
+                clean_location = "Manhattan Dining Room Deck 7 Aft"
+            if clean_stage == "Kinetic Ocean":
+                clean_location = "Pool Deck Deck 16"
             
-            stage_key = (e["clean_stage"], e["clean_location"])
-            e["stage_key"] = stage_key
-            unique_stages.add(stage_key)
+            # Create a normalized key for uniqueness (Title case)
+            stage_key = (clean_stage, clean_location)
+            
+            # If this stage/location combo hasn't been seen, create it
+            if stage_key not in stages_map:
+                new_stage = Stage(name=clean_stage, location_name=clean_location)
+                session.add(new_stage)
+                session.flush()  # Flush to generate ID if needed
+                stages_map[stage_key] = new_stage
+            
+            # Assign the shared object to the event
+            e["clean_stage"] = stages_map[stage_key].name
+            e["clean_location"] = stages_map[stage_key].location_name
+            e["stage_key"] = stage_key # Optional: keep for logic reference
             
             raw_event = e.get("event")
             e["clean_artist"] = sanitize_value(raw_event, fallback="General Announcement")
             unique_artist_names.add(e["clean_artist"])
 
-        print(f"Seeding {len(unique_stages)} stages...")
-        stages_dict = {}
-        for stage_name, location_name in unique_stages:
-            stage = Stage(name=stage_name, location_name=location_name)
-            session.add(stage)
-            session.flush()
-            stages_dict[(stage_name, location_name)] = stage
+        print(f"Seeding {len(stages_map)} unique stages...")
 
         print(f"Seeding {len(unique_artist_names)} artists/events...")
         artists_dict = {}
         for name in unique_artist_names:
             dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(768)]
-            
-            artist = Artist(
-                name=name,
-                genre="Unknown",
-                description=f"Event/Performance: {name}",
-                embedding=dummy_embedding
-            )
+
+            activities = ["SOUND HEALING (COSMIC CORAL)", "OPEN DECK SIGN UPS (CASINO)",
+            "CARTOONS + CEREAL BAR (THE PEARL)", "RISE + RADIATE YOGA (KINETIC OCEAN)",
+            "RAVERCISE (KINETIC OCEAN)", "OPEN DECK (CASINO)", "UP TO DATE (CIRCUIT WAVES)",
+            "CHARACTER BRUNCH EGGSTRAVAGANZA (TASTE&SAVOR)", "LAUGHS AHOY! COMEDY (DEEP DIVE DISCO)",
+            "DEEP CORE, DEEPER BEATS YOGA (COSMIC CORAL)", "BACARDÍ RAVE BINGO (CIRCUIT WAVES)"]
+
+            if name in activities:
+                artist = Artist(
+                    name=name,
+                    genre="Activity",
+                    description=f"{name}",
+                    embedding=dummy_embedding
+                )
+            elif name == "General Announcement":
+                artist = Artist(
+                    name=name,
+                    genre="Announcement",
+                    description=f"{name}",
+                    embedding=dummy_embedding
+                )
+            else:    
+                artist = Artist(
+                    name=name,
+                    genre="Unknown",
+                    description=f"Event/Performance: {name}",
+                    embedding=dummy_embedding
+                )
             session.add(artist)
             session.flush()
             artists_dict[name] = artist
@@ -162,13 +201,13 @@ def seed_database():
             current_event = e
             
             try:
-                # Convert start time to UTC
-                start_dt = parse_to_utc(e['festival_date'], e['start_time'])
+                # Convert start time to 24-hour time
+                start_dt = parse_local_datetime(e['festival_date'], e['start_time'])
                 
                 # Handle End Time
                 end_time_raw = e.get('end_time')
                 if end_time_raw and str(end_time_raw).strip().lower() not in ["null", "none", "", "n/a"]:
-                    end_dt = parse_to_utc(e['festival_date'], str(end_time_raw))
+                    end_dt = parse_local_datetime(e['festival_date'], str(end_time_raw))
                     
                     # Midnight rollover check: If end is before start, it's the next day
                     if end_dt <= start_dt:
@@ -179,7 +218,7 @@ def seed_database():
                 
                 performance = Performance(
                     artist_id=artists_dict[e['clean_artist']].id,
-                    stage_id=stages_dict[e['stage_key']].id,
+                    stage_id=stages_map[e['stage_key']].id,
                     start_time=start_dt,
                     end_time=end_dt
                 )
@@ -191,7 +230,7 @@ def seed_database():
             
         try:
             session.commit()
-            print("Database successfully seeded with UTC times.")
+            print("Database successfully seeded with 24-hour times.")
         except Exception as e:
             session.rollback()
             print(f"Error occurred during: {current_event}\n{traceback.format_exc()}")

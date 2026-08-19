@@ -3,3 +3,4 @@ psycopg2-binary>=2.9
 pgvector>=0.5
 openai>=3.0.0
 ddgs>=9.15.0
+ortools>=9.15

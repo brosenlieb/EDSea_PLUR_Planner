@@ -105,7 +105,7 @@ def enrich_database():
         try:
             # 5. Call the local model using Structured Outputs.  Tuned format for Gemma.
             response = client.chat.completions.create(
-                model="Gemma-4-12B-it-MTP-GGUF", 
+                model="gemma-4-12b-it-GGUF-UD-Q5_K_XL", 
                 messages=[
                     {"role": "user", "content": full_prompt}
                 ],
