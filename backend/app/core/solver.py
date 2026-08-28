@@ -23,7 +23,7 @@ def generate_optimal_schedule(
     """
 
     # Pre-processing: calculate rarity & scores
-    # Count how many times each artist plays to identify rare sets
+    # Count how many times each artist plays to identify singular sets
     artist_set_counts = {}
     for p in performances:
         artist_set_counts[p["artist_id"]] = artist_set_counts.get(p["artist_id"], 0) + 1
@@ -49,7 +49,7 @@ def generate_optimal_schedule(
     for p in performances:
         attendance_vars[p["id"]] = model.NewBoolVar(f'attend_{p["id"]}')
 
-    # Constraint 1: Assume no need to see the same artist twice
+    # Constraint 1: Assume there's no need to see the same artist twice
     # Group performances by artist_id
     perf_by_artist = {}
     for p in performances:
@@ -71,7 +71,7 @@ def generate_optimal_schedule(
             first, second = (p1, p2) if p1["start_time"] < p2["start_time"] else (p2, p1)
             
             # Look up travel time in minutes. Default to 0 if it's the same stage.
-            travel_mins = travel_matrix.get((first["stage_id"], second["stage_id"]), 0)
+            travel_mins = travel_matrix.get((first["location"], second["location"]), 0)
             
             # The earliest we can arrive at the second stage assuming no stopping
             # for bathroom, drinks, etc.

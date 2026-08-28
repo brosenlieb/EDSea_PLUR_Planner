@@ -47,14 +47,14 @@ class Performance(Base):
     stage = relationship("Stage", back_populates="performances")
 
 
-class StageDistance(Base):
+class LocationDistance(Base):
     """
     The Travel Matrix: Defines how long it takes to walk from Stage A to Stage B.
-    This is crucial for the Google OR-Tools scheduling engine later.
+    Necessary for Google OR-Tools scheduling engine.
     """
-    __tablename__ = 'stage_distances'
+    __tablename__ = 'location_distances'
     
     id = Column(Integer, primary_key=True, index=True)
-    stage_a_id = Column(Integer, ForeignKey('stages.id'))
-    stage_b_id = Column(Integer, ForeignKey('stages.id'))
+    location_a = Column(String, index=True)
+    location_b = Column(String, index=True)
     distance_minutes = Column(Integer)

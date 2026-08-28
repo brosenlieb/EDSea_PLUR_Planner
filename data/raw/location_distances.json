@@ -1,0 +1,227 @@
+[
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Manhattan Dining Room Deck 7 Aft",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Spice H20 Deck 17 Aft",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Joy Theater Deck 7 Fwd",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Atrium Deck 6 Mid",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "The Social Deck 6 Mid",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Casino Deck 7 Mid",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "Pool Deck Deck 16",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 6
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "Spice H20 Deck 17 Aft",
+        "distance_minutes": 7
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "Joy Theater Deck 7 Fwd",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "Atrium Deck 6 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "The Social Deck 6 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "Casino Deck 7 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "Manhattan Dining Room Deck 7 Aft",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 3
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "Joy Theater Deck 7 Fwd",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "Atrium Deck 6 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "The Social Deck 6 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "Casino Deck 7 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "Spice H20 Deck 17 Aft",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Joy Theater Deck 7 Fwd",
+        "location_b": "Atrium Deck 6 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Joy Theater Deck 7 Fwd",
+        "location_b": "The Social Deck 6 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Joy Theater Deck 7 Fwd",
+        "location_b": "Casino Deck 7 Mid",
+        "distance_minutes": 3
+    },
+    {
+        "location_a": "Joy Theater Deck 7 Fwd",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Joy Theater Deck 7 Fwd",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "Joy Theater Deck 7 Fwd",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Atrium Deck 6 Mid",
+        "location_b": "The Social Deck 6 Mid",
+        "distance_minutes": 3
+    },
+    {
+        "location_a": "Atrium Deck 6 Mid",
+        "location_b": "Casino Deck 7 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Atrium Deck 6 Mid",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Atrium Deck 6 Mid",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "Atrium Deck 6 Mid",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 3
+    },
+    {
+        "location_a": "The Social Deck 6 Mid",
+        "location_b": "Casino Deck 7 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "The Social Deck 6 Mid",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "The Social Deck 6 Mid",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "The Social Deck 6 Mid",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 3
+    },
+    {
+        "location_a": "Casino Deck 7 Mid",
+        "location_b": "The Cavern Deck 8 Mid",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "Casino Deck 7 Mid",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "Casino Deck 7 Mid",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 4
+    },
+    {
+        "location_a": "The Cavern Deck 8 Mid",
+        "location_b": "Harvest Caye Beach",
+        "distance_minutes": 15
+    },
+    {
+        "location_a": "The Cavern Deck 8 Mid",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 5
+    },
+    {
+        "location_a": "Harvest Caye Beach",
+        "location_b": "Taste & Savor Deck 6 Aft",
+        "distance_minutes": 15
+    }
+]
