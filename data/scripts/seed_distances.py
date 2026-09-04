@@ -5,15 +5,16 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.app.db.models import LocationDistance
 
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
+from backend.app.db.models import LocationDistance
+
 load_dotenv()
 # Connect to database
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:password@localhost:5432/mydatabase")
+DATABASE_URL = os.getenv("DB_URL", "postgresql://admin:password@localhost:5432/mydatabase")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -40,6 +41,10 @@ def seed_location_distances():
             loc_a = entry.get("location_a")
             loc_b = entry.get("location_b")
             dist = entry["distance_minutes"]
+
+            # Add additional time when returning from beach for security screening
+            if loc_a == "Harvest Caye Beach":
+                dist += 2
 
             if not loc_a or not loc_b:
                 print(f"Warning: Skipping malformed record: {entry}")
