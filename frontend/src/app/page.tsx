@@ -6,13 +6,13 @@ import { Artist, RecommendedArtist, PerformanceSlot } from "../types";
 
 export default function FestivalPlanner() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [favorites, setFavorites] = useState<number[]>([]);
-  
+  const [favorites, setFavorites] = useState<string[]>([]);
+
   return (
     <main className="max-w-4xl mx-auto p-6 min-h-screen bg-gray-50 text-gray-900">
       <header className="mb-8 border-b pb-4">
-        <h1 className="text-3xl font-extrabold tracking-tight">Shipwrecked Festival AI</h1>
-        <p className="text-gray-500 mt-2">Pick your top artists, and we'll handle the logistics.</p>
+        <h1 className="text-3xl font-extrabold tracking-tight">EDSea PLUR Planner 2026</h1>
+        <p className="text-gray-500 mt-2">Pick your top artists, and we'll give you an EDMmaxxed Schedule.</p>
       </header>
 
       {step === 1 && (
@@ -41,60 +41,104 @@ export default function FestivalPlanner() {
   );
 }
 
-// --- STEP 1: Artist Selection ---
+// Artist Selection
 function ArtistSelection({ favorites, setFavorites, onNext }: any) {
-  const [artists, setArtists] = useState<Artist[]>([]);
-  const [search, setSearch] = useState("");
+    const [artists, setArtists] = useState<Artist[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    api.getArtists(search).then(setArtists).catch(console.error);
-  }, [search]);
+    useEffect(() => {
+    api.getArtists()
+        .then((data: any) => {
+        
+        // Handle array vs wrapped response shapes
+        const artistList = Array.isArray(data) 
+            ? data 
+            : data?.artists || data?.items || [];
 
-  const toggleArtist = (id: number) => {
-    setFavorites((prev: number[]) => 
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        setArtists(artistList);
+        })
+        .catch((err) => {
+        console.error("--> API ERROR:", err);
+        setArtists([]); // Reset to empty array on error
+        })
+        .finally(() => {
+        setLoading(false);
+        });
+    }, []);
+
+    const toggleArtist = (artistId: string) => {
+    setFavorites((prev: string[]) => {
+        if (prev.includes(artistId)) {
+        return prev.filter((id) => id !== artistId); // Deselect
+        }
+        if (prev.length < 5) {
+        return [...prev, artistId]; // Select if under limit
+        }
+        return prev; // Cap at 5 max
+    });
+    };
+
+    const isSelectionValid = favorites.length >= 3 && favorites.length <= 5;
+    const isMaxReached = favorites.length >= 5;
+
+    if (loading) return <p className="p-4 text-center">Loading artists...</p>;
+
+    return (
+        <div className="max-w-4xl mx-auto p-4">
+        <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Select 3 to 5 Favorite Artists</h2>
+            <span className={`text-sm font-semibold ${isSelectionValid ? 'text-green-400' : 'text-amber-400'}`}>
+            Selected: {favorites.length} / 5 (Min 3)
+            </span>
+        </div>
+
+        {/* Scrollable grid container for ~40 items */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-2 border border-gray-700 rounded-lg">
+            {artists.map((artist) => {
+            const idStr = artist.id.toString();
+            const isChecked = favorites.includes(idStr);
+            const isDisabled = !isChecked && isMaxReached;
+
+            return (
+                <label
+                key={artist.id}
+                className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    isChecked
+                    ? 'bg-indigo-950 border-indigo-500 text-white'
+                    : isDisabled
+                    ? 'bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                }`}
+                >
+                <input
+                    type="checkbox"
+                    checked={isChecked}
+                    disabled={isDisabled}
+                    onChange={() => toggleArtist(artist.id.toString())}
+                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+                />
+                <span className="font-medium text-sm select-none">{artist.name}</span>
+                </label>
+            );
+            })}
+        </div>
+
+        {/* Progress & Next Step Trigger */}
+        <div className="flex justify-between items-center mt-6">
+            <p className="text-sm">Selected: {favorites.length} / 5 (Minimum 3)</p>
+            <button
+            disabled={!isSelectionValid}
+            onClick={onNext}
+            className="px-6 py-2 bg-blue-600 rounded disabled:opacity-50"
+            >
+            Get Recommendations
+            </button>
+        </div>
+        </div>
     );
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">1. Select 3-5 Artists You Love</h2>
-        <button 
-          onClick={onNext}
-          disabled={favorites.length < 1}
-          className="bg-blue-600 text-white px-6 py-2 rounded font-semibold disabled:opacity-50"
-        >
-          Get AI Recommendations
-        </button>
-      </div>
-
-      <input 
-        type="text" 
-        placeholder="Search artists by name or genre..." 
-        className="w-full p-3 border rounded shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {artists.map(artist => (
-          <div 
-            key={artist.id}
-            onClick={() => toggleArtist(artist.id)}
-            className={`p-4 rounded border cursor-pointer transition-all ${
-              favorites.includes(artist.id) ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-white hover:shadow-md'
-            }`}
-          >
-            <h3 className="font-bold">{artist.name}</h3>
-            <span className="text-xs bg-gray-200 px-2 py-1 rounded text-gray-700">{artist.genre}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
 
-// --- STEP 2: Recommendation Grid ---
+// Recommendation Grid
 function RecommendationGrid({ favorites, onNext, onBack }: any) {
   const [recs, setRecs] = useState<RecommendedArtist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +183,7 @@ function RecommendationGrid({ favorites, onNext, onBack }: any) {
   );
 }
 
-// --- STEP 3: Timetable View ---
+// Timetable View
 function Timetable({ favorites, onBack }: any) {
   const [schedule, setSchedule] = useState<PerformanceSlot[]>([]);
   const [loading, setLoading] = useState(true);

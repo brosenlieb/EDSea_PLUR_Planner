@@ -47,6 +47,16 @@ class Performance(Base):
     stage = relationship("Stage", back_populates="performances")
 
 
+class Activity(Base):
+    __tablename__ = 'activities'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    activity_name = Column(String, index=True)
+    stage_id = Column(Integer, ForeignKey('stages.id'))
+    start_time = Column(DateTime(timezone=True))
+    end_time = Column(DateTime(timezone=True))
+
+
 class LocationDistance(Base):
     """
     The Travel Matrix: Defines how long it takes to walk from Stage A to Stage B.
@@ -58,3 +68,12 @@ class LocationDistance(Base):
     location_a = Column(String, index=True)
     location_b = Column(String, index=True)
     distance_minutes = Column(Integer)
+
+class Announcement(Base):
+    __tablename__ = 'announcements'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    announcement_name = Column(String, index=True)
+    stage_id = Column(Integer, ForeignKey('stages.id'))
+    start_time = Column(DateTime(timezone=True))
+    end_time = Column(DateTime(timezone=True))

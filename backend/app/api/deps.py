@@ -1,9 +1,16 @@
 import os
+import sys
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Set up the engine exactly as we did in the seed script
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:password@localhost:5432/mydatabase")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+
+from dotenv import load_dotenv
+load_dotenv()
+
+DATABASE_URL = os.getenv("DB_URL", "postgresql://admin:password@localhost:5432/mydatabase")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

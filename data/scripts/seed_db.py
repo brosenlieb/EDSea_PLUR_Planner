@@ -15,7 +15,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
 # Import the models
-from backend.app.db.models import Base, Stage, Artist, Performance, StageDistance
+from backend.app.db.models import Base, Activity, Stage, Artist, Performance, Announcement, Event
+from ingestion_models import StandardizedEvent
 
 load_dotenv()
 DATABASE_URL = os.getenv("DB_URL")
@@ -25,16 +26,12 @@ if not DATABASE_URL:
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# --- CONFIGURATION ---
-# Change this to the timezone where the festival actually takes place
-SOURCE_TIMEZONE = "America/New_York" 
-
 SCHEDULE_FILES = [
-    {"file": "data/raw/day1.json", "date": "2025-11-01"},
-    {"file": "data/raw/day2.json", "date": "2025-11-02"},
-    {"file": "data/raw/day3.json", "date": "2025-11-03"},
-    {"file": "data/raw/day4.json", "date": "2025-11-04"},
-    {"file": "data/raw/day5.json", "date": "2025-11-05"},
+    {"file": "data/raw/day1.json", "date": "2025-11-01", "day": 1},
+    {"file": "data/raw/day2.json", "date": "2025-11-02", "day": 2},
+    {"file": "data/raw/day3.json", "date": "2025-11-03", "day": 3},
+    {"file": "data/raw/day4.json", "date": "2025-11-04", "day": 4},
+    {"file": "data/raw/day5.json", "date": "2025-11-05", "day": 5},
 ]
 
 def sanitize_value(val, fallback):
@@ -45,43 +42,6 @@ def sanitize_value(val, fallback):
     if clean_val.lower() in ["null", "all", "none", "n/a", ""]:
         return fallback
     return clean_val
-
-def parse_local_datetime(date_str: str, time_str: str) -> datetime:
-    """
-    Parses a date and time string, normalizes it to a 24-hour format,
-    and returns a timezone-aware datetime object in the local festival timezone.
-    Args:
-        date_str: Date in "YYYY-MM-DD" format.
-        time_str: Time in "HH:MM" (24-hour) or "H:MM AM/PM" format.
-        
-    Returns:
-        A timezone-aware datetime object in SOURCE_TIMEZONE.
-    """
-    # Clean input: " 2:30 PM " -> "2:30PM"
-    normalized_time = time_str.strip().replace(" ", "").upper()
-
-    # Determine if input is 12-hour (contains AM/PM) or 24-hour
-    if "AM" in normalized_time or "PM" in normalized_time:
-        # Parse 12-hour format
-        temp_dt = datetime.strptime(normalized_time, "%I:%M%p")
-        # Convert to a 24-hour string: "2:30 PM" -> "14:30"
-        clean_time = temp_dt.strftime("%H:%M")
-    else:
-        # Assume 24-hour format, ensure "H:MM" becomes "HH:MM"
-        clean_time = normalized_time
-        if len(clean_time) == 4:
-            clean_time = f"0{clean_time}"
-    combined_str = f"{date_str} {clean_time}"
-    
-    try:
-        # Parse into a naive datetime object
-        naive_dt = datetime.strptime(combined_str, "%Y-%m-%d %H:%M")
-    except ValueError as e:
-        raise ValueError(f"Time '{combined_str}' is not in a valid format: {e}")
-
-    # Attach the local festival timezone without converting to UTC
-    # UTC conversion may be added back later depending on 2027 data
-    return naive_dt.replace(tzinfo=ZoneInfo(SOURCE_TIMEZONE))
 
 def seed_database():
     print("Connecting to database...")
@@ -97,144 +57,75 @@ def seed_database():
     session = SessionLocal()
 
     try:
-        print("Reading JSON files...")
-        all_events = []
+        print("Reading JSON file...")
         for sf in SCHEDULE_FILES:
             try:
                 with open(sf["file"], 'r') as f:
                     data = json.load(f)
-                    events = data.get("performances", data) if isinstance(data, dict) else data
+                    events = data.get(data) if isinstance(data, dict) else data
                     
                     for event in events:
-                        event['festival_date'] = sf['date']
-                        all_events.append(event)
+                        event['event_date'] = sf['date']
+                        event['event_day'] = sf['day']
             except FileNotFoundError:
                 print(f"Warning: {sf['file']} not found. Skipping.")
 
-        if not all_events:
-            print("No event data found. Exiting.")
-            return
+            for raw_event in events:
+                print("Sanitizing and scheduled items...")
+                clean_event = StandardizedEvent.model_validate(raw_event)
 
-        print("Sanitizing and extracting entities...")
-        unique_artist_names = set()
-        # Map normalized keys (lowercase) to the Stage objects
-        # Key format: (normalized_stage_name, normalized_location_name)
-        stages_map = {}
-        
-        for e in all_events:
-            raw_stage = e.get("stage")
-            raw_location = e.get("location")
-            
-            # Clean values for display/storage
-            clean_stage = sanitize_value(raw_stage, fallback="Festival Wide").title()
-            clean_location = sanitize_value(raw_location, fallback="General Area").title()
+                # Gets stage record (stage.id), creates if it doesn't yet exist.
+                stage = session.query(Stage).filter_by(name=clean_event.stage_name).first()
+                if not stage:
+                    stage = Stage(name=clean_event.stage_name, fallback="n/a")
+                    session.add(stage)
+                    session.flush()
 
-            #Specific edits for a few edge cases.  May not apply to 2027 data.
-            if clean_location == "Manhattan Dining Deck 7 Aft":
-                clean_location = "Manhattan Dining Room Deck 7 Aft"
-            if clean_stage == "Kinetic Ocean":
-                clean_location = "Pool Deck Deck 16"
-            
-            # Create a normalized key for uniqueness (Title case)
-            stage_key = (clean_stage, clean_location)
-            
-            # If this stage/location combo hasn't been seen, create it
-            if stage_key not in stages_map:
-                new_stage = Stage(name=clean_stage, location_name=clean_location)
-                session.add(new_stage)
-                session.flush()  # Flush to generate ID if needed
-                stages_map[stage_key] = new_stage
-            
-            # Assign the shared object to the event
-            e["clean_stage"] = stages_map[stage_key].name
-            e["clean_location"] = stages_map[stage_key].location_name
-            e["stage_key"] = stage_key # Optional: keep for logic reference
-            
-            raw_event = e.get("event")
-            e["clean_artist"] = sanitize_value(raw_event, fallback="General Announcement")
-            unique_artist_names.add(e["clean_artist"])
+                #Specific edits for a few edge cases.  May not apply to 2027 data.
+                if clean_event.location_name == "Manhattan Dining Deck 7 Aft":
+                    clean_event.location_name = "Manhattan Dining Room Deck 7 Aft"
+                if clean_event.stage_name == "Kinetic Ocean":
+                    clean_event.location_name = "Pool Deck Deck 16"
 
-        print(f"Seeding {len(stages_map)} unique stages...")
-
-        print(f"Seeding {len(unique_artist_names)} artists/events...")
-        artists_dict = {}
-        for name in unique_artist_names:
-            dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(768)]
-
-            activities = ["SOUND HEALING (COSMIC CORAL)", "OPEN DECK SIGN UPS (CASINO)",
-            "CARTOONS + CEREAL BAR (THE PEARL)", "RISE + RADIATE YOGA (KINETIC OCEAN)",
-            "RAVERCISE (KINETIC OCEAN)", "OPEN DECK (CASINO)", "UP TO DATE (CIRCUIT WAVES)",
-            "CHARACTER BRUNCH EGGSTRAVAGANZA (TASTE&SAVOR)", "LAUGHS AHOY! COMEDY (DEEP DIVE DISCO)",
-            "DEEP CORE, DEEPER BEATS YOGA (COSMIC CORAL)", "BACARDÍ RAVE BINGO (CIRCUIT WAVES)"]
-
-            if name in activities:
-                artist = Artist(
-                    name=name,
-                    genre="Activity",
-                    description=f"{name}",
-                    embedding=dummy_embedding
+                # Come back and add "Day 1/2/5" to the base_event
+                base_event = Event(
+                    stage_id=stage.id,
+                    location_name=clean_event.location_name,
+                    event_type=clean_event.event_type,
+                    start_time=clean_event.start_time,
+                    end_time=clean_event.end_time
                 )
-            elif name == "General Announcement":
-                artist = Artist(
-                    name=name,
-                    genre="Announcement",
-                    description=f"{name}",
-                    embedding=dummy_embedding
-                )
-            else:    
-                artist = Artist(
-                    name=name,
-                    genre="Unknown",
-                    description=f"Event/Performance: {name}",
-                    embedding=dummy_embedding
-                )
-            session.add(artist)
-            session.flush()
-            artists_dict[name] = artist
-            
+                session.add(base_event)
+                session.flush()
+
+                # Add additional info (artist name, activity type, etc based on event_type)
+                if clean_event.event_type == "performance":
+                    artist = session.query(Artist).filter_by(name=clean_event.event_name).first()
+                    if not artist:
+                        dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(768)]
+                        artist = Artist(
+                            name=clean_event.event_name,
+                            genre="Unknown",
+                            description=f"Event/Performance: {clean_event.event_name}",
+                            embedding=dummy_embedding
+                        )                        
+                        session.add(artist)
+                        session.flush()
+                    perf = Performance(event_id=base_event.id, artist_id=artist.id)
+                    session.add(perf)
+                elif clean_event.event_type == "activity":
+                    act = Activity(event_id=base_event.id, title=clean_event.entity_name)
+                    session.add(act)
+                elif clean_event.event_type == "announcement":
+                    ann = Announcement(event_id=base_event.id, title=clean_event.entity_name)
+                    session.add(ann)
+     
         session.commit()
-
-        print("Seeding performances...")
-        current_event = None
-        
-        for e in all_events:
-            current_event = e
-            
-            try:
-                # Convert start time to 24-hour time
-                start_dt = parse_local_datetime(e['festival_date'], e['start_time'])
-                
-                # Handle End Time
-                end_time_raw = e.get('end_time')
-                if end_time_raw and str(end_time_raw).strip().lower() not in ["null", "none", "", "n/a"]:
-                    end_dt = parse_local_datetime(e['festival_date'], str(end_time_raw))
-                    
-                    # Midnight rollover check: If end is before start, it's the next day
-                    if end_dt <= start_dt:
-                        end_dt += timedelta(days=1)
-                else:
-                    # Default to 15 minutes after start time
-                    end_dt = start_dt + timedelta(minutes=15)
-                
-                performance = Performance(
-                    artist_id=artists_dict[e['clean_artist']].id,
-                    stage_id=stages_map[e['stage_key']].id,
-                    start_time=start_dt,
-                    end_time=end_dt
-                )
-                session.add(performance)
-                
-            except (ValueError, KeyError) as ve:
-                print(f"Skipping event '{e.get('clean_artist', 'Unknown')}' due to error: {ve}. See {current_event}")
-                continue
-            
-        try:
-            session.commit()
-            print("Database successfully seeded with 24-hour times.")
-        except Exception as e:
-            session.rollback()
-            print(f"Error occurred during: {current_event}\n{traceback.format_exc()}")
-            raise 
+        print("Database successfully seeded.")
+    except Exception as e:
+        session.rollback()
+        print(f"Error occurred during: {clean_event}\n{traceback.format_exc()}")
+        raise 
     finally:
         session.close()
 
