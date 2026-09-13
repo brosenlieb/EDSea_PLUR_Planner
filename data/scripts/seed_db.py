@@ -3,19 +3,17 @@ import sys
 import json
 import random
 import traceback
-from datetime import datetime, timezone, timedelta
-from zoneinfo import ZoneInfo
+from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from pathlib import Path
+from datetime import timedelta
 
-# Automatically locate project root (2 levels up from data/scripts/seed_db.py)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-# Import the models
-from backend.app.db.models import Base, Activity, Stage, Artist, Performance, Announcement, Event
+# Removed 'Event' import; updated to match models.py
+from backend.app.db.models import Base, Activity, Location, Artist, Performance, Announcement
 from ingestion_models import StandardizedEvent
 
 load_dotenv()
@@ -34,71 +32,61 @@ SCHEDULE_FILES = [
     {"file": "data/raw/day5.json", "date": "2025-11-05", "day": 5},
 ]
 
-def sanitize_value(val, fallback):
-    """Checks for null, 'all', or empty strings and applies a safe fallback."""
-    if not val:
-        return fallback
-    clean_val = str(val).strip()
-    if clean_val.lower() in ["null", "all", "none", "n/a", ""]:
-        return fallback
-    return clean_val
-
 def seed_database():
     print("Connecting to database...")
     
     with engine.connect() as conn:
+        conn.execute(text("DROP SCHEMA public CASCADE;"))
+        conn.execute(text("CREATE SCHEMA public;"))
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
         conn.commit()
 
     print("Creating tables...")
-    Base.metadata.drop_all(bind=engine) 
     Base.metadata.create_all(bind=engine)
-
     session = SessionLocal()
 
     try:
-        print("Reading JSON file...")
         for sf in SCHEDULE_FILES:
-            try:
-                with open(sf["file"], 'r') as f:
-                    data = json.load(f)
-                    events = data.get(data) if isinstance(data, dict) else data
-                    
-                    for event in events:
-                        event['event_date'] = sf['date']
-                        event['event_day'] = sf['day']
-            except FileNotFoundError:
+            file_path = Path(sf["file"])
+            if not file_path.exists():
                 print(f"Warning: {sf['file']} not found. Skipping.")
+                continue
+
+            print(f"Processing {sf['file']}...")
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+                events = data.get("events", data) if isinstance(data, dict) else data
 
             for raw_event in events:
-                print("Sanitizing and scheduled items...")
+                print(f"Current event: {raw_event}")
+                raw_event['event_date'] = sf['date']
                 clean_event = StandardizedEvent.model_validate(raw_event)
 
-                # Gets stage record (stage.id), creates if it doesn't yet exist.
-                stage = session.query(Stage).filter_by(name=clean_event.stage_name).first()
-                if not stage:
-                    stage = Stage(name=clean_event.stage_name, fallback="n/a")
-                    session.add(stage)
-                    session.flush()
+                # Handle events that start before midnight and end after midnight
+                if clean_event.end_time < clean_event.start_time:
+                    clean_event.end_time += timedelta(days=1)
 
-                #Specific edits for a few edge cases.  May not apply to 2027 data.
+                # Edge case overrides
                 if clean_event.location_name == "Manhattan Dining Deck 7 Aft":
                     clean_event.location_name = "Manhattan Dining Room Deck 7 Aft"
                 if clean_event.stage_name == "Kinetic Ocean":
                     clean_event.location_name = "Pool Deck Deck 16"
 
-                # Come back and add "Day 1/2/5" to the base_event
-                base_event = Event(
-                    stage_id=stage.id,
+                # Get or create Location record respecting the (name, location_name) constraint
+                location = session.query(Location).filter_by(
                     location_name=clean_event.location_name,
-                    event_type=clean_event.event_type,
-                    start_time=clean_event.start_time,
-                    end_time=clean_event.end_time
-                )
-                session.add(base_event)
-                session.flush()
+                    stage_name=clean_event.stage_name
+                ).first()
+                
+                if not location:
+                    location = Location(
+                        location_name=clean_event.location_name,
+                        stage_name=clean_event.stage_name
+                    )
+                    session.add(location)
+                    session.flush()
 
-                # Add additional info (artist name, activity type, etc based on event_type)
+                # Insert directly into individual tables
                 if clean_event.event_type == "performance":
                     artist = session.query(Artist).filter_by(name=clean_event.event_name).first()
                     if not artist:
@@ -106,25 +94,43 @@ def seed_database():
                         artist = Artist(
                             name=clean_event.event_name,
                             genre="Unknown",
-                            description=f"Event/Performance: {clean_event.event_name}",
+                            description=f"Performance by {clean_event.event_name}",
                             embedding=dummy_embedding
                         )                        
                         session.add(artist)
                         session.flush()
-                    perf = Performance(event_id=base_event.id, artist_id=artist.id)
+
+                    perf = Performance(
+                        artist_id=artist.id,
+                        location_id=location.id,
+                        start_time=clean_event.start_time,
+                        end_time=clean_event.end_time
+                    )
                     session.add(perf)
+
                 elif clean_event.event_type == "activity":
-                    act = Activity(event_id=base_event.id, title=clean_event.entity_name)
+                    act = Activity(
+                        activity_name=clean_event.event_name,
+                        location_id=location.id,
+                        start_time=clean_event.start_time,
+                        end_time=clean_event.end_time
+                    )
                     session.add(act)
+
                 elif clean_event.event_type == "announcement":
-                    ann = Announcement(event_id=base_event.id, title=clean_event.entity_name)
+                    ann = Announcement(
+                        announcement_name=clean_event.event_name,
+                        location_id=location.id,
+                        start_time=clean_event.start_time,
+                        end_time=clean_event.end_time
+                    )
                     session.add(ann)
      
         session.commit()
         print("Database successfully seeded.")
     except Exception as e:
         session.rollback()
-        print(f"Error occurred during: {clean_event}\n{traceback.format_exc()}")
+        print(f"Error occurred during execution:\n{traceback.format_exc()}")
         raise 
     finally:
         session.close()
