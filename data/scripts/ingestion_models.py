@@ -109,7 +109,7 @@ class StandardizedEvent(RawEventInput):
         activity_keywords = [
             "yoga", "convoy", "toast", "cartoons", "brunch", "bingo", "open deck","ravercise",
             "comedy", "sound healing", "weddings", "sandcastle", "appreciation", "feud",
-            "class", "mario"
+            "class", "mario", "up to date"
         ]
         
         if any(kw in entity for kw in announcement_keywords):

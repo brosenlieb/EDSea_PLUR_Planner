@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Literal
 from datetime import datetime
 
 class ArtistResponse(BaseModel):
@@ -17,8 +17,13 @@ class RecommendedArtist(BaseModel):
     name: str
     genre: str
 
+class ActivityPreference(BaseModel):
+    activity_id: int
+    priority: Literal["must_have", "nice_to_have"]
+
 class ScheduleRequest(BaseModel):
     favorite_artist_ids: List[int]
+    activity_preferences: Optional[List[ActivityPreference]] = []
 
 class PerformanceSlot(BaseModel):
     id: int

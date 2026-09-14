@@ -144,7 +144,8 @@
     "day_num": "5"
   },
   {
-    "artist": "Dombresky Presents Disco Dom",
+    "title": "Dombresky Presents Disco Dom",
+    "artist": "Dombresky",
     "stage": "Circuit Waves",
     "location": "Joy Theater Deck 7 FWD",
     "start_time": "1:30 AM",
@@ -208,7 +209,8 @@
     "day_num": "5"
   },
   {
-    "artist": "OMNOM & Friends",
+    "title": "OMNOM & Friends",
+    "artist": "OMNOM",
     "stage": "Deep Dive Disco",
     "location": "The Social Deck 6 MID",
     "start_time": "8:30 PM",
@@ -217,15 +219,15 @@
   },
   {
     "artist": "Cartoons + Cereal Bar",
-    "stage": "Misc Activities",
-    "location": "The Pearl",
+    "stage": "The Pearl",
+    "location": "Atrium Deck 6 MID",
     "start_time": "10:00 AM",
     "end_time": "12:00 PM",
     "day_num": "5"
   },
   {
     "artist": "Character Brunch Eggstravaganza",
-    "stage": "Misc Activities",
+    "stage": null,
     "location": "Taste & Savor",
     "start_time": "11:00 AM",
     "end_time": "2:00 PM",
@@ -233,88 +235,97 @@
   },
   {
     "artist": "Sound Healing",
-    "stage": "Misc Activities",
-    "location": "Cosmic Coral",
+    "stage": "Cosmic Coral",
+    "location": "Manhattan Dining Deck 7 Aft",
     "start_time": "1:00 PM",
     "end_time": "2:00 PM",
     "day_num": "5"
   },
   {
     "artist": "Open Deck Sign Ups",
-    "stage": "Misc Activities",
-    "location": "Casino",
+    "stage": "KANDI CASINO",
+    "location": "Casino Deck 7 Mid",
     "start_time": "5:00 PM",
-    "end_time": "5:00 PM",
+    "end_time": "5:15 PM",
     "day_num": "5"
   },
   {
     "artist": "Open Deck",
-    "stage": "Misc Activities",
-    "location": "Casino",
+    "stage": "KANDI CASINO",
+    "location": "Casino Deck 7 Mid",
     "start_time": "5:30 PM",
     "end_time": "7:30 PM",
     "day_num": "5"
   },
   {
-    "artist": "Casa De Bolo Casino Set",
-    "stage": "Misc Activities",
-    "location": "Casino",
+    "title": "Casa De Bolo Casino Set",
+    "artist": "Casa De Bolo",
+    "stage": "KANDI CASINO",
+    "location": "Casino Deck 7 Mid",
     "start_time": "7:30 PM",
     "end_time": "8:45 PM",
     "day_num": "5"
   },
   {
     "artist": "Cosmic Comeback Flow Yoga",
-    "stage": "Misc Activities",
-    "location": "Kinetic Ocean",
+    "stage": "Kinetic Ocean",
+    "location": "Pool Deck Deck 16",
     "start_time": "10:00 AM",
     "end_time": "11:00 AM",
     "day_num": "5"
   },
   {
     "artist": "Baller Bingo Cards On Sale",
-    "stage": "Misc Activities",
-    "location": "Deep Dive Disco",
+    "stage": "Deep Dive Disco",
+    "location": "The Social Deck 6 MID",
     "start_time": "10:30 AM",
     "end_time": "11:30 AM",
     "day_num": "5"
   },
   {
     "artist": "Baller Bingo",
-    "stage": "Misc Activities",
-    "location": "Deep Dive Disco",
+    "stage": "Deep Dive Disco",
+    "location": "The Social Deck 6 MID",
     "start_time": "11:30 AM",
     "end_time": "12:30 PM",
     "day_num": "5"
   },
   {
     "artist": "Mario Kart Sign Ups",
-    "stage": "Misc Activities",
-    "location": "The Pearl",
+    "stage": "The Pearl",
+    "location": "Atrium Deck 6 MID",
     "start_time": "12:30 PM",
     "end_time": "12:30 PM",
     "day_num": "5"
   },
   {
     "artist": "Mario Kart Tournament",
-    "stage": "Misc Activities",
-    "location": "The Pearl",
+    "stage": "The Pearl",
+    "location": "Atrium Deck 6 MID",
     "start_time": "1:00 PM",
     "end_time": "3:00 PM",
     "day_num": "5"
   },
   {
     "artist": "Laughs Ahoy! Comedy",
-    "stage": "Misc Activities",
-    "location": "Deep Dive Disco",
+    "stage": "Deep Dive Disco",
+    "location": "The Social Deck 6 MID",
     "start_time": "4:00 PM",
     "end_time": "5:00 PM",
     "day_num": "5"
   },
   {
+    "artist": "All Bars Close",
+    "stage": null,
+    "location": null,
+    "start_time": "2:00 AM",
+    "end_time": null,
+    "day_num": "5"
+  },
+  {
     "artist": "Up To Date",
-    "stage": "Misc Activities",
-    "location": "Circuit Waves",
+    "stage": "Circuit Waves",
+    "location": "Joy Theater Deck 7 FWD",
     "start_time": "7:00 PM",
     "end_time": "9:00 PM",
     "day_num": "5"

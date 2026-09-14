@@ -88,23 +88,39 @@ def seed_database():
 
                 # Insert directly into individual tables
                 if clean_event.event_type == "performance":
-                    artist = session.query(Artist).filter_by(name=clean_event.event_name).first()
-                    if not artist:
-                        dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(768)]
-                        artist = Artist(
-                            name=clean_event.event_name,
-                            genre="Unknown",
-                            description=f"Performance by {clean_event.event_name}",
-                            embedding=dummy_embedding
-                        )                        
-                        session.add(artist)
-                        session.flush()
+                    # Extract artist name from raw fields; if not exist, pull default event name
+                    # which should be a string with a singular artist's name.
+                    raw_artists = raw_event.get("artist_names") or raw_event.get("artist_name") or clean_event.event_name
+                    
+                    # Normalize string vs list into a unified list
+                    artist_name_list = [raw_artists] if isinstance(raw_artists, str) else raw_artists
 
+                    # Find or create every artist participating in this set
+                    artists_for_perf = []
+                    for name in artist_name_list:
+                        artist = session.query(Artist).filter_by(name=name).first()
+                        if not artist:
+                            dummy_embedding = [random.uniform(-1.0, 1.0) for _ in range(768)]
+                            artist = Artist(
+                                name=name,
+                                genre="Unknown",
+                                description=f"Performance by {name}",
+                                embedding=dummy_embedding
+                            )
+                            session.add(artist)
+                            session.flush()
+                        artists_for_perf.append(artist)
+
+                    # Check for a title property in the JSON; else use the artist names w/ B2B in between
+                    set_title = raw_event.get("title") or " B2B ".join([a.name for a in artists_for_perf])
+
+                    # Instantiate Performance with Many-to-Many relationship
                     perf = Performance(
-                        artist_id=artist.id,
+                        title=set_title,
                         location_id=location.id,
                         start_time=clean_event.start_time,
-                        end_time=clean_event.end_time
+                        end_time=clean_event.end_time,
+                        artists=artists_for_perf  # Performance can have >=1 artist
                     )
                     session.add(perf)
 

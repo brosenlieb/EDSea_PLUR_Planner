@@ -240,99 +240,99 @@
     "day_num": "2"
   },
   {
-    "event": "CARTOONS + CEREAL BAR (THE PEARL)",
+    "event": "CARTOONS + CEREAL BAR",
     "start_time": "10:00AM",
     "end_time": "12:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "THE PEARL",
+    "location": "ATRIUM DECK 6 MID",
     "day_num": "2"
   },
   {
-    "event": "CHARACTER BRUNCH EGGSTRAVAGANZA (TASTE&SAVOR)",
+    "event": "CHARACTER BRUNCH EGGSTRAVAGANZA",
     "start_time": "11:00AM",
     "end_time": "2:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": null,
+    "location": "TASTE & SAVOR",
     "day_num": "2"
   },
   {
-    "event": "BACARDÍ RAVE BINGO (CIRCUIT WAVES)",
+    "event": "BACARDÍ RAVE BINGO",
     "start_time": "2:00PM",
     "end_time": "3:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD",
     "day_num": "2"
   },
   {
     "event": "UP TO DATE (CIRCUIT WAVES)",
     "start_time": "5:00PM",
     "end_time": "6:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD",
     "day_num": "2"
   },
   {
-    "event": "OPEN DECK SIGN UPS (CASINO)",
+    "event": "OPEN DECK SIGN UPS",
     "start_time": "7:30PM",
-    "end_time": "7:30PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "end_time": "7:45PM",
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID",
     "day_num": "2"
   },
   {
-    "event": "OPEN DECK (CASINO)",
+    "event": "OPEN DECK",
     "start_time": "8:00PM",
     "end_time": "10:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID",
     "day_num": "2"
   },
   {
-    "event": "RISE + RADIATE YOGA (KINETIC OCEAN)",
+    "event": "RISE + RADIATE YOGA",
     "start_time": "10:00AM",
     "end_time": "11:00AM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
     "day_num": "2"
   },
   {
-    "event": "RAVERCISE (KINETIC OCEAN)",
+    "event": "RAVERCISE",
     "start_time": "11:00AM",
     "end_time": "12:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16",
     "day_num": "2"
   },
   {
-    "event": "SOUND HEALING (COSMIC CORAL)",
+    "event": "SOUND HEALING",
     "start_time": "1:00PM",
     "end_time": "2:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING DECK 7 AFT",
     "day_num": "2"
   },
   {
-    "event": "DEEP CORE, DEEPER BEATS YOGA (COSMIC CORAL)",
+    "event": "DEEP CORE, DEEPER BEATS YOGA",
     "start_time": "3:00PM",
     "end_time": "4:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING DECK 7 AFT",
     "day_num": "2"
   },
   {
-    "event": "LAUGHS AHOY! COMEDY (DEEP DIVE DISCO)",
+    "event": "LAUGHS AHOY! COMEDY",
     "start_time": "4:00PM",
     "end_time": "5:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "DEEP DIVE DISCO",
+    "location": "THE SOCIAL DECK 6 MID",
     "day_num": "2"
   },
   {
-    "event": "LAUGHS AHOY! COMEDY (DEEP DIVE DISCO)",
+    "event": "LAUGHS AHOY! COMEDY",
     "start_time": "7:00PM",
     "end_time": "8:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "OTHER",
+    "stage": "DEEP DIVE DISCO",
+    "location": "THE SOCIAL DECK 6 MID",
     "day_num": "2"
   }
 ]

@@ -129,7 +129,8 @@
   },
   {
     "day_num": "4",
-    "artist": "AMÉMÉ B2B MAZ",
+    "title": "AMÉMÉ B2B MAZ",
+    "artist_name": ["AMÉMÉ", "MAZ"],
     "start_time": "12:45AM",
     "end_time": "3:00AM",
     "stage": "NEON SPLASH",
@@ -169,7 +170,8 @@
   },
   {
     "day_num": "4",
-    "artist": "MALAA'S ALTER EGO",
+    "title": "MALAA'S ALTER EGO",
+    "artist": "MALAA",
     "start_time": "1:30AM",
     "end_time": "3:00AM",
     "stage": "CIRCUIT WAVES",
@@ -201,7 +203,8 @@
   },
   {
     "day_num": "4",
-    "artist": "R3HAB (BASSMENT SESSION)",
+    "title": "R3HAB (BASSMENT SESSION)",
+    "artist": "R3HAB",
     "start_time": "8:15PM",
     "end_time": "9:30PM",
     "stage": "THE PEARL",
@@ -249,7 +252,8 @@
   },
   {
     "day_num": "4",
-    "artist": "ALEXJAY B2B MCLOV3N",
+    "title": "ALEXJAY B2B MCLOV3N",
+    "artist": ["ALEXJAY", "MCLOV3N"],
     "start_time": "5:30PM",
     "end_time": "7:00PM",
     "stage": "KANDI CASINO",
@@ -268,71 +272,79 @@
     "artist": "CHARACTER BRUNCH EGGSTRAVAGANZA",
     "start_time": "11:00AM",
     "end_time": "2:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "TASTE&SAVOR"
+    "stage": null,
+    "location": "TASTE & SAVOR"
   },
   {
     "day_num": "4",
     "artist": "3-TIMERS ONLY EDSEA OG APPRECIATION PARTY",
     "start_time": "3:00PM",
     "end_time": "4:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "NEON SPLASH"
+    "stage": "NEON SPLASH",
+    "location": "SPICE H2O DECK 17 AFT"
   },
   {
     "day_num": "4",
     "artist": "LAUGHS AHOY! COMEDY",
     "start_time": "4:00PM",
     "end_time": "5:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "DEEP DIVE DISCO"
+    "stage": "DEEP DIVE DISCO",
+    "location": "THE SOCIAL DECK 6 MID"
   },
   {
     "day_num": "4",
     "artist": "RAVE FAM FEUD",
     "start_time": "7:00PM",
     "end_time": "8:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "CIRCUIT WAVES"
+    "stage": "CIRCUIT WAVES",
+    "location": "JOY THEATER DECK 7 FWD"
   },
   {
     "day_num": "4",
     "artist": "LOFI STRETCH + SONIC SOOTHE YOGA",
     "start_time": "11:00AM",
     "end_time": "12:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "KINETIC OCEAN"
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
   },
   {
     "day_num": "4",
     "artist": "SHUFFLE CLASS",
     "start_time": "2:00PM",
     "end_time": "3:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "KINETIC OCEAN"
+    "stage": "KINETIC OCEAN",
+    "location": "POOL DECK DECK 16"
   },
   {
     "day_num": "4",
     "artist": "SOUND HEALING",
     "start_time": "7:00PM",
     "end_time": "8:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "COSMIC CORAL"
+    "stage": "COSMIC CORAL",
+    "location": "MANHATTAN DINING ROOM DECK 7 AFT"
   },
   {
     "day_num": "4",
     "artist": "OPEN DECK SIGN UPS",
     "start_time": "8:30PM",
     "end_time": null,
-    "stage": "MISC ACTIVITIES",
-    "location": "CASINO"
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID"
+  },
+  {
+    "day_num": "4",
+    "artist": "ALL ABOARD",
+    "start_time": "8:30AM",
+    "end_time": null,
+    "stage": null,
+    "location": null
   },
   {
     "day_num": "4",
     "artist": "OPEN DECK",
     "start_time": "9:00PM",
     "end_time": "11:00PM",
-    "stage": "MISC ACTIVITIES",
-    "location": "CASINO"
+    "stage": "KANDI CASINO",
+    "location": "CASINO DECK 7 MID"
   }
 ]

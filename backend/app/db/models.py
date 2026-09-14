@@ -1,8 +1,15 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import declarative_base, relationship
 from pgvector.sqlalchemy import Vector
 
 Base = declarative_base()
+
+performance_artists = Table(
+    'performance_artists',
+    Base.metadata,
+    Column('performance_id', Integer, ForeignKey('performances.id', ondelete="CASCADE"), primary_key=True),
+    Column('artist_id', Integer, ForeignKey('artists.id', ondelete="CASCADE"), primary_key=True)
+)
 
 class Location(Base):
     __tablename__ = 'locations'
@@ -35,12 +42,13 @@ class Performance(Base):
     __tablename__ = 'performances'
     
     id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=True)
     artist_id = Column(Integer, ForeignKey('artists.id'))
     location_id = Column(Integer, ForeignKey('locations.id'))
     start_time = Column(DateTime(timezone=True))
     end_time = Column(DateTime(timezone=True))
 
-    artist = relationship("Artist", back_populates="performances")
+    artists = relationship("Artist", secondary=performance_artists, backref="performances")
     location = relationship("Location", back_populates="performances")
 
 class Activity(Base):

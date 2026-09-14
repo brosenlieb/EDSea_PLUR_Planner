@@ -97,7 +97,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Kinahau",
     "start_time": "4:00PM",
@@ -105,7 +105,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Tom & Collins",
     "start_time": "6:00PM",
@@ -113,7 +113,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Omri.",
     "start_time": "7:30PM",
@@ -121,7 +121,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "LP Giobbi",
     "start_time": "9:00PM",
@@ -129,7 +129,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Armand Van Helden",
     "start_time": "10:30PM",
@@ -137,15 +137,15 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
-    "artist_event": "Disclosure (DJ Set)",
+    "artist_event": "Disclosure",
     "start_time": "12:00AM",
     "end_time": "1:30AM"
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Blond:ish",
     "start_time": "1:30AM",
@@ -153,7 +153,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Vintage Culture",
     "start_time": "3:00AM",
@@ -161,7 +161,7 @@
   },
   {
     "day_num": "3",
-    "stage": "Harvest Cave",
+    "stage": "Harvest Caye",
     "area": "Sonic Paradise",
     "artist_event": "Jamie Jones",
     "start_time": "4:30AM",
@@ -169,54 +169,48 @@
   },
   {
     "day_num": "3",
-    "stage": "Misc Activities",
+    "stage": "Kinetic Ocean",
     "area": "Other",
-    "location": "Kinetic Ocean",
     "artist_event": "Rooted + Raving Yoga",
     "start_time": "10:00AM",
     "end_time": "11:00AM"
   },
   {
     "day_num": "3",
-    "stage": "Misc Activities",
+    "stage": "The Pearl",
     "area": "Other",
-    "location": "The Pearl",
     "artist_event": "Cartoons + Cereal Bar",
     "start_time": "10:00AM",
     "end_time": "12:00PM"
   },
   {
     "day_num": "3",
-    "stage": "Misc Activities",
+    "stage": "The Pearl",
     "area": "Other",
-    "location": "The Pearl",
     "artist_event": "Weddings @ EDSea",
     "start_time": "1:00PM",
     "end_time": "3:00PM"
   },
   {
     "day_num": "3",
-    "stage": "Misc Activities",
-    "area": "Other",
-    "location": "Belize Beach",
+    "stage": "Belize Beach",
+    "area": "Harvest Caye",
     "artist_event": "Sandcastle Building",
     "start_time": "4:00PM",
     "end_time": "5:00PM"
   },
   {
     "day_num": "3",
-    "stage": "Misc Activities",
+    "stage": "The Pearl",
     "area": "Other",
-    "location": "The Pearl",
     "artist_event": "Bacardí Welcome to Belize Toast",
     "start_time": "4:30PM",
     "end_time": "4:30PM"
   },
   {
     "day_num": "3",
-    "stage": "Misc Activities",
+    "stage": "Cosmic Coral",
     "area": "Other",
-    "location": "Cosmic Coral",
     "artist_event": "Sound Healing",
     "start_time": "7:00PM",
     "end_time": "8:00PM"
@@ -224,9 +218,9 @@
   {
     "day_num": "3",
     "stage": "Special Notice",
-    "area": "Itinerary",
+    "area": "All",
     "artist_event": "Arrive to Belize (Eastern Time)",
     "start_time": "4:30PM",
-    "end_time": "4:30PM"
+    "end_time": "4:45PM"
   }
 ]

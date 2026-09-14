@@ -163,7 +163,8 @@
   {
     "location_name": "Joy Theater Deck 7 FWD",
     "stage_name": "Circuit Waves",
-    "artist_name": "ALOK PRESENTS: SOMETHING ELSE",
+    "artist_name": "ALOK",
+    "title": "ALOK PRESENTS: SOMETHING ELSE",
     "start_time": "1:15AM",
     "end_time": "2:45AM"
   },
@@ -184,14 +185,16 @@
   {
     "location_name": "Atrium Deck 6 MID",
     "stage_name": "The Pearl",
-    "artist_name": "MADHAUS (MADDY O'NEAL HOUSE SET)",
+    "title": "MADHAUS (MADDY O'NEAL HOUSE SET)",
+    "artist_name": "MADDY O'NEAL",
     "start_time": "5:30PM",
     "end_time": "7:00PM"
   },
   {
     "location_name": "Atrium Deck 6 MID",
     "stage_name": "The Pearl",
-    "artist_name": "LAYZ SABRITAZ HOUSE SET",
+    "title": "LAYZ SABRITAZ HOUSE SET",
+    "artist_name": "LAYZ",
     "start_time": "7:00PM",
     "end_time": "8:30PM"
   },
@@ -266,23 +269,23 @@
     "end_time": "2:00AM"
   },
   {
-    "location_name": "Other",
-    "stage_name": "Misc Activities",
-    "artist_name": "CONVOY CONNECTIONS (THE NEST)",
+    "location_name": "Maltings Whiskey Bar",
+    "stage_name": "The Nest",
+    "artist_name": "CONVOY CONNECTIONS",
     "start_time": "2:00PM",
     "end_time": "5:00PM"
   },
   {
-    "location_name": "Other",
-    "stage_name": "Misc Activities",
-    "artist_name": "WELCOME HOME TOAST W/ BACARDÍ (KINETIC OCEAN)",
+    "location_name": "Pool Deck Deck 16",
+    "stage_name": "KINETIC OCEAN",
+    "artist_name": "WELCOME HOME TOAST W/ BACARDÍ",
     "start_time": "5:15PM",
     "end_time": "5:30PM"
   },
   {
-    "location_name": "Other",
-    "stage_name": "Misc Activities",
-    "artist_name": "MERCH STORE OPENS (OBSERVATION LOUNGE)",
+    "location_name": "OBSERVATION LOUNGE",
+    "stage_name": null,
+    "artist_name": "MERCH STORE OPENS",
     "start_time": "9:00PM",
     "end_time": "9:15PM"
   }
