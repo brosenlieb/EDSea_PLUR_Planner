@@ -122,7 +122,7 @@ function ArtistSelection({ favorites, setFavorites, activityPrefs, setActivityPr
                     onChange={() => toggleArtist(artist.id.toString())}
                     className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
                 />
-                <span className="font-medium text-sm select-none">{artist.name}</span>
+                <span className="font-medium text-sm select-none text-white">{artist.name}</span>
                 </label>
             );
             })}
@@ -265,7 +265,7 @@ function Timetable({ favorites, activityPrefs, onBack }: {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-bold text-lg text-gray-900">
-                        {isPerformance ? slot.artist_name : slot.title}
+                        {slot.title}
                       </h3>
                       <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
                         isPerformance 
@@ -277,12 +277,12 @@ function Timetable({ favorites, activityPrefs, onBack }: {
                     </div>
 
                     <p className="text-sm text-gray-600">
-                      {slot.stage_name} • <span className="font-medium">{slot.location}</span>
+                      {slot.stage_name} • <span className="font-medium">{slot.location_name}</span>
                     </p>
 
                     {index < schedule.length - 1 && (
                       <p className="text-xs text-amber-600 mt-2 font-medium">
-                        Next up: Travel to {schedule[index + 1].location}
+                        Next up: Travel to {schedule[index + 1].location_name}
                       </p>
                     )}
                   </div>
@@ -308,9 +308,10 @@ function ActivitySelection({
 
   useEffect(() => {
     api.getActivities()
-      .then((data: any) => {
+      .then((data: Activity[] | { activities: Activity[] }) => {
         const activityList = Array.isArray(data) ? data : data?.activities || [];
         setActivities(activityList);
+        console.log('Fetched activities:', data);
       })
       .catch((err) => {
         console.error("--> API ERROR fetching activities:", err);
@@ -349,32 +350,30 @@ function ActivitySelection({
   return (
     <div className="mt-8 border-t border-gray-200 pt-6">
       <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900">Enhance Your Schedule with Activities</h3>
+        <h3 className="text-xl font-bold text-gray-900">Other Scheduled Activities</h3>
         <p className="text-sm text-gray-600">
-          Want yoga, food tastings, or pool parties? Mark your priority level for non-musical events.
+          Yoga, gameshows, morning cartoons, and more can all be added to your PLUR planner!
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {activities.map((act) => {
+        {activities.map((activity) => {
           const currentPref =
-            activityPrefs.find((p) => p.activity_id === act.id)?.priority || "none";
+            activityPrefs.find((p) => p.activity_id === activity.id)?.priority || "none";
 
           return (
             <div
-              key={act.id}
+              key={activity.id}
               className="flex items-center justify-between p-3.5 border rounded-lg bg-white shadow-sm"
             >
               <div>
-                <span className="font-semibold text-gray-900 block text-sm">{act.title}</span>
-                <span className="text-xs font-bold text-purple-600 uppercase tracking-wide">
-                  {act.category}
-                </span>
+                <span className="font-semibold text-gray-900 block text-sm">{activity.activity_name}</span>
+                <span className="font-normal text-gray-600 block text-sm">{activity.start_time} - {activity.end_time}</span>
               </div>
 
               <select
                 value={currentPref}
-                onChange={(e) => handlePriorityChange(act.id, e.target.value)}
+                onChange={(e) => handlePriorityChange(activity.id, e.target.value)}
                 className="text-xs border border-gray-300 rounded-md px-2.5 py-1.5 bg-gray-50 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="none">Not Interested</option>

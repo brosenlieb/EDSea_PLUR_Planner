@@ -21,11 +21,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 async def embed_artists():
     session = SessionLocal()
     try:
-        # Fetch artists that don't have an embedding yet.   
-        artists = session.query(Artist).filter(Artist.embedding.is_(None)).all()
+        # Use this to only fetch artists that don't have an embedding yet.   
+        #artists = session.query(Artist).filter(Artist.embedding.is_(None)).all()
 
-        # Use this if you want to overwrite instead.
-        # artists = session.query(Artist).all()
+        # Use this if you want to overwrite instead. Useful for first run to replace
+        # default dummy embeddings.
+        artists = session.query(Artist).all()
 
         if not artists:
             print("All artists already have embeddings or the artist list is empty!")

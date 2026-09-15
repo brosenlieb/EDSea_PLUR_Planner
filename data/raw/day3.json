@@ -170,7 +170,7 @@
   {
     "day_num": "3",
     "stage": "Kinetic Ocean",
-    "area": "Other",
+    "area": "Pool Deck Deck 16",
     "artist_event": "Rooted + Raving Yoga",
     "start_time": "10:00AM",
     "end_time": "11:00AM"
@@ -178,7 +178,7 @@
   {
     "day_num": "3",
     "stage": "The Pearl",
-    "area": "Other",
+    "area": "Atrium Deck 6 Mid",
     "artist_event": "Cartoons + Cereal Bar",
     "start_time": "10:00AM",
     "end_time": "12:00PM"
@@ -186,7 +186,7 @@
   {
     "day_num": "3",
     "stage": "The Pearl",
-    "area": "Other",
+    "area": "Atrium Deck 6 Mid",
     "artist_event": "Weddings @ EDSea",
     "start_time": "1:00PM",
     "end_time": "3:00PM"
@@ -202,7 +202,7 @@
   {
     "day_num": "3",
     "stage": "The Pearl",
-    "area": "Other",
+    "area": "Atrium Deck 6 Mid",
     "artist_event": "Bacardí Welcome to Belize Toast",
     "start_time": "4:30PM",
     "end_time": "4:30PM"
@@ -210,15 +210,15 @@
   {
     "day_num": "3",
     "stage": "Cosmic Coral",
-    "area": "Other",
+    "area": "Manhattan Dining Room Deck 7 Aft",
     "artist_event": "Sound Healing",
     "start_time": "7:00PM",
     "end_time": "8:00PM"
   },
   {
     "day_num": "3",
-    "stage": "Special Notice",
-    "area": "All",
+    "stage": null,
+    "area": null,
     "artist_event": "Arrive to Belize (Eastern Time)",
     "start_time": "4:30PM",
     "end_time": "4:45PM"

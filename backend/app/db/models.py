@@ -36,19 +36,18 @@ class Artist(Base):
     description = Column(String)
     embedding = Column(Vector(768))
     
-    performances = relationship("Performance", back_populates="artist")
+    performances = relationship("Performance", secondary=performance_artists, back_populates="artists")
 
 class Performance(Base):
     __tablename__ = 'performances'
     
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=True)
-    artist_id = Column(Integer, ForeignKey('artists.id'))
     location_id = Column(Integer, ForeignKey('locations.id'))
     start_time = Column(DateTime(timezone=True))
     end_time = Column(DateTime(timezone=True))
 
-    artists = relationship("Artist", secondary=performance_artists, backref="performances")
+    artists = relationship("Artist", secondary=performance_artists, back_populates="performances")
     location = relationship("Location", back_populates="performances")
 
 class Activity(Base):

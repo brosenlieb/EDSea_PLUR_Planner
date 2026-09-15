@@ -10,7 +10,7 @@ from backend.app.db.models import Artist
 router = APIRouter()
 
 @router.get("/artists", response_model=List[ArtistResponse])
-def get_artists(q: str = None, limit: int = 50, db: Session = Depends(get_db)):
+def get_artists(q: str = None, limit: int = 120, db: Session = Depends(get_db)):
     """
     Fetch festival artists. 
     Optionally filter by name or genre using the '?q=' query parameter.

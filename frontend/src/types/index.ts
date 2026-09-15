@@ -11,27 +11,31 @@ export interface RecommendedArtist {
   genre: string;
 }
 
-export interface EventSlot {
-  id: number;
-  title: string;
-  event_type: 'performance' | 'activity';
-  stage_name: string;
-  location: string;
-  start_time: string;
-  end_time: string;
-  artist_id?: number;
-  artist_name?: string;
-  category?: string;
-}
-
 export interface Activity {
   id: number;
-  title: string;
-  category: string;
-  description?: string;
+  activity_name: string;
+  location_id: number;
+  start_time: string;
+  end_time: string;
 }
 
 export interface ActivityPref {
   activity_id: number;
   priority: 'must_have' | 'nice_to_have';
+}
+
+export interface EventSlot {
+  id: string;
+  title: string;
+  event_type: 'performance' | 'activity';
+  start_time: string;
+  end_time: string;
+  location_id: number;
+  location_name: string;
+  stage_name?: string;
+  
+  // Optional depending on event_type
+  artist_ids?: number[];
+  category?: string;
+  priority?: 'must_have' | 'nice_to_have';
 }

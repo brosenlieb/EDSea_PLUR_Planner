@@ -1,17 +1,18 @@
 from datetime import datetime, timedelta
-from typing import Optional, Literal
+from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field, field_validator, ValidationInfo, AliasChoices, model_validator
 
 # Accept several different forms of inputs
 class RawEventInput(BaseModel):
-    location_name: str = Field(
-        ..., 
-        validation_alias=AliasChoices("location_name", "location", "area")
+    location_name: Optional[str] = Field(
+        default="Shipwide", 
+        validation_alias=AliasChoices("location_name", "location", "area"),
+        allow_none=True
     )
     
-    event_name: str = Field(
+    event_name: Union[str, list[str]] = Field(
         ..., 
-        validation_alias=AliasChoices("artist_name", "artist", "artist_event", "event")
+        validation_alias=AliasChoices("artist_name", "artist", "artist_event", "event", "artist_names")
     )
 
     stage_name: Optional[str] = Field(
@@ -29,16 +30,21 @@ class RawEventInput(BaseModel):
     # end_times optional for several announcments which only provide start times
     end_time: Optional[datetime] = None
 
-    # Clean text casing
+    # Clean text casing; works for both single strings or lists
     @field_validator("stage_name", "event_name", "location_name", mode="before")
     @classmethod
-    def normalize_casing(cls, v: str) -> str:
+    def normalize_casing(cls, v: Union[str, list[str], None]) -> Union[str, list[str], None]:
+        def _clean(text: str) -> str:
+            text = text.strip().title()
+            acronyms = {"W/": "w/", "It'S": "It's", "Og": "OG", "Edsea": "EDSea"}
+            for word, replacement in acronyms.items():
+                text = text.replace(word, replacement)
+            return text
+
         if isinstance(v, str):
-            v = v.strip().title()
-            # Preserve certain acronyms if desired
-            # acronyms = {"Dj": "DJ", "Mc": "MC", "Vip": "VIP", "Q&a": "Q&A"}
-            # for word, replacement in acronyms.items():
-                # v = v.replace(word, replacement)
+            return _clean(v)
+        elif isinstance(v, list):
+            return [_clean(item) for item in v if isinstance(item, str)]
         return v
 
     @field_validator("start_time", "end_time", mode="before")
@@ -103,7 +109,11 @@ class StandardizedEvent(RawEventInput):
     # Classify the event type based on text patterns
     @model_validator(mode="after")
     def classify_event(self) -> "StandardizedEvent":
-        entity = self.event_name.lower()
+        # Flattens artist list for B2B performances w/ multiple artists
+        if isinstance(self.event_name, list):
+            entity = " ".join(self.event_name).lower()
+        else:
+            entity = self.event_name.lower()
         
         announcement_keywords = ["opens", "close", "arrive", "safety messaging", "sail away", "all aboard"]
         activity_keywords = [

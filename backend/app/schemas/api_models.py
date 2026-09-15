@@ -34,3 +34,23 @@ class PerformanceSlot(BaseModel):
     location:str
     start_time: datetime
     end_time: datetime
+
+class EventSlot(BaseModel):
+    id: str 
+    title: str
+    event_type: Literal["performance", "activity"]
+    start_time: datetime
+    end_time: datetime
+    location_id: int
+    location_name: str
+    stage_name: Optional[str] = "n/a"
+    
+    # Performance-specific fields
+    artist_ids: Optional[list[int]] = None
+    
+    # Activity-specific fields
+    category: Optional[str] = None
+    priority: Optional[str] = None
+
+    class Config:
+        from_attributes = True
