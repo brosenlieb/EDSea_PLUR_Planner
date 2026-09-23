@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "../lib/api";
+import { getActivityLabel, formatTimeET } from "../lib/utils";
 import { Artist, RecommendedArtist, EventSlot, ActivityPref, Activity } from "../types";
 
 export default function FestivalPlanner() {
@@ -216,7 +217,8 @@ function RecommendationGrid({ favorites, activityPrefs, onNext, onBack }: {
 
 // Timetable View
 function Timetable({ favorites, activityPrefs, onBack }: {
-  favorites: string[]; activityPrefs: ActivityPref[]; onBack: () => void}) {
+  favorites: string[]; activityPrefs: ActivityPref[]; onBack: () => void
+}) {
   const [schedule, setSchedule] = useState<EventSlot[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -226,10 +228,6 @@ function Timetable({ favorites, activityPrefs, onBack }: {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [favorites, activityPrefs]);
-
-  const formatTime = (isoString: string) => {
-    return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
 
   return (
     <div className="space-y-6">
@@ -252,12 +250,12 @@ function Timetable({ favorites, activityPrefs, onBack }: {
                   isPerformance ? "bg-white border-gray-200" : "bg-purple-50 border-purple-200"
                 }`}
               >
-                {/* Time Sidebar */}
-                <div className={`p-4 w-32 flex flex-col justify-center items-center shrink-0 ${
+                {/* Time Sidebar — Uses formatTimeET to lock times to Eastern Time */}
+                <div className={`p-4 w-36 flex flex-col justify-center items-center shrink-0 ${
                   isPerformance ? "bg-slate-800 text-white" : "bg-purple-900 text-purple-100"
                 }`}>
-                  <span className="font-bold text-sm">{formatTime(slot.start_time)}</span>
-                  <span className="text-xs opacity-75">to {formatTime(slot.end_time)}</span>
+                  <span className="font-bold text-sm">{formatTimeET(slot.start_time)}</span>
+                  <span className="text-xs opacity-75">to {formatTimeET(slot.end_time)}</span>
                 </div>
 
                 {/* Event Details */}
@@ -277,7 +275,8 @@ function Timetable({ favorites, activityPrefs, onBack }: {
                     </div>
 
                     <p className="text-sm text-gray-600">
-                      {slot.stage_name} • <span className="font-medium">{slot.location_name}</span>
+                      {slot.stage_name ? `${slot.stage_name} • ` : ""}
+                      <span className="font-medium">{slot.location_name}</span>
                     </p>
 
                     {index < schedule.length - 1 && (
@@ -358,27 +357,25 @@ function ActivitySelection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {activities.map((activity) => {
-          const currentPref =
-            activityPrefs.find((p) => p.activity_id === activity.id)?.priority || "none";
+          const currentPref = activityPrefs.find((p) => p.activity_id === activity.id);
+          const currentPrefValue = currentPref ? currentPref.priority : "none";
 
           return (
-            <div
-              key={activity.id}
-              className="flex items-center justify-between p-3.5 border rounded-lg bg-white shadow-sm"
-            >
-              <div>
-                <span className="font-semibold text-gray-900 block text-sm">{activity.activity_name}</span>
-                <span className="font-normal text-gray-600 block text-sm">{activity.start_time} - {activity.end_time}</span>
-              </div>
+            <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm mb-2">
+              {/* Activity Label displaying Name, Day, and Eastern Time Range */}
+              <span className="text-sm font-medium text-gray-900 pr-4">
+                {getActivityLabel(activity)}
+              </span>
 
+              {/* Your Priority Selector */}
               <select
-                value={currentPref}
+                value={currentPrefValue}
                 onChange={(e) => handlePriorityChange(activity.id, e.target.value)}
-                className="text-xs border border-gray-300 rounded-md px-2.5 py-1.5 bg-gray-50 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="text-xs border border-gray-300 rounded-md px-2.5 py-1.5 bg-gray-50 text-gray-800 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-shrink-0"
               >
                 <option value="none">Not Interested</option>
-                <option value="nice_to_have">Nice to Have (If free)</option>
-                <option value="must_have">Must Have (High Priority)</option>
+                <option value="nice_to_have">Nice to Have (if free)</option>
+                <option value="must_have">Must Have (high priority)</option>
               </select>
             </div>
           );

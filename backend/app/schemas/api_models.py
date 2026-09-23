@@ -1,6 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import List, Optional, Literal
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+EASTERN_TZ = ZoneInfo("America/New_York")
 
 class ArtistResponse(BaseModel):
     id: int
@@ -41,8 +44,8 @@ class EventSlot(BaseModel):
     event_type: Literal["performance", "activity"]
     start_time: datetime
     end_time: datetime
-    location_id: int
-    location_name: str
+    location_id: int | None = None
+    location_name: str = "All Locations"
     stage_name: Optional[str] = "n/a"
     
     # Performance-specific fields
@@ -52,5 +55,13 @@ class EventSlot(BaseModel):
     category: Optional[str] = None
     priority: Optional[str] = None
 
+    # Help catch instances where times are still in UTC
+    @field_serializer('start_time', 'end_time')
+    def serialize_dt_to_eastern(self, dt: datetime, _info):
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+        # Returns ISO 8601 string with Eastern offset (-04:00 or -05:00)
+        return dt.astimezone(EASTERN_TZ).isoformat()
+    
     class Config:
         from_attributes = True
