@@ -1,4 +1,4 @@
-[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-red.svg)](#-license--legal-disclaimer)
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_Noncommercial_1.0.0-red.svg)](##license--legal-disclaimer)
 
 # EDSea PLUR Planner
 
