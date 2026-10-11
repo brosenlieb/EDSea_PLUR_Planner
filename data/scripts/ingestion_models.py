@@ -36,7 +36,8 @@ class RawEventInput(BaseModel):
     def normalize_casing(cls, v: Union[str, list[str], None]) -> Union[str, list[str], None]:
         def _clean(text: str) -> str:
             text = text.strip().title()
-            acronyms = {"W/": "w/", "It'S": "It's", "Og": "OG", "Edsea": "EDSea"}
+            acronyms = {"W/": "w/", "It'S": "It's", "Oguz": "OGUZ", "Og": "OG", "Edsea": "EDSea",
+                        "Dj": "DJ", "Mcl": "McL", "Lp": "LP", "Ydg": "YDG", "Lofi": "LoFi", "3N": "3n"}
             for word, replacement in acronyms.items():
                 text = text.replace(word, replacement)
             return text
