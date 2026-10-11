@@ -6,34 +6,72 @@ from backend.app.core.recommendation import get_recommendations
 from backend.app.core.solver import generate_optimal_schedule
 from backend.app.db.models import Performance, Activity, LocationDistance, Announcement
 from zoneinfo import ZoneInfo
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Any
 
 router = APIRouter()
 
 EASTERN_TZ = ZoneInfo("America/New_York")
 
-def to_eastern(dt):
-    """Converts DB datetime to Eastern Time wall-clock time."""
+def to_eastern(dt: datetime | None) -> datetime | None:
+    """Converts a database datetime to Eastern Time wall-clock time.
+
+    Args:
+        dt: The datetime object to convert. If None, returns None. Naive
+            datetimes are assumed to be in UTC.
+
+    Returns:
+        The converted datetime in Eastern Time. If the resulting time is
+        between 12:00 AM and 5:59 AM ET, it is shifted forward by one day
+        for chronological solver sorting.
+    """
     if dt is None:
         return None
-    # Strip attached timezone (e.g. UTC from DB driver) then assign Eastern
-    dt_naive = dt.replace(tzinfo=None)
+        
+    # If naive, assume UTC from the database
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+        
+    # Convert UTC hours to true Eastern Time hours (e.g., 20:30 UTC -> 16:30 EDT)
+    dt_eastern = dt.astimezone(EASTERN_TZ)
     
-    # If the event is between 12:00 AM and 5:59 AM, shift it to 
-    # the next calendar day so chronological sorting and solving work properly.
-    if dt_naive.hour < 6:
-        dt_naive += timedelta(days=1)
+    # If the event is between 12:00 AM and 5:59 AM ET, shift it
+    # for chronological solver sorting if required by your pipeline
+    if dt_eastern.hour < 6:
+        dt_eastern += timedelta(days=1)
 
-    return dt_naive.replace(tzinfo=EASTERN_TZ)
+    return dt_eastern
 
-# Location name extraction for null values
-def get_location_name(entity, default: str) -> str:
+def get_location_name(entity: Any, default: str) -> str:
+    """Extracts the location name from an entity object, returning a default value if not found.
+
+    Args:
+        entity: The entity object containing location information.
+        default: The default location name to return if the entity's location
+                 is missing or empty.
+
+    Returns:
+        The location name from the entity, or the default value if unavailable.
+    """
     if entity and getattr(entity, "location", None):
         return getattr(entity.location, "location_name", None) or default
     return default
 
 @router.post("/schedule/generate", response_model=list[EventSlot])
-def generate_schedule(payload: ScheduleRequest, db: Session = Depends(get_db)):
+def generate_schedule(payload: ScheduleRequest, db: Session = Depends(get_db)) -> list[EventSlot]:
+    """Generates an optimized festival schedule based on user preferences and AI recommendations.
+
+    This function retrieves performances, selected activities, and announcements,
+    runs a constraint solver to optimize the schedule, and returns a chronologically
+    sorted list of event slots.
+
+    Args:
+        payload: The request containing favorite artist IDs and activity preferences.
+        db: The database session used to fetch performances, activities, and distances.
+
+    Returns:
+        A list of sorted, optimized event slots for the user's schedule.
+    """
     # Grab AI recommendations
     recommended_artists = get_recommendations(db, payload.favorite_artist_ids, limit=10)
     recommended_ids = [a.id for a in recommended_artists]

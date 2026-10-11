@@ -8,11 +8,12 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
 
-# Removed 'Event' import; updated to match models.py
+# Models and schemas
 from backend.app.db.models import Base, Activity, Location, Artist, Performance, Announcement
 from ingestion_models import StandardizedEvent
 
@@ -24,6 +25,8 @@ if not DATABASE_URL:
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+EASTERN_TZ = ZoneInfo("America/New_York")
+
 SCHEDULE_FILES = [
     {"file": "data/raw/day1.json", "date": "2025-11-01", "day": 1},
     {"file": "data/raw/day2.json", "date": "2025-11-02", "day": 2},
@@ -31,6 +34,13 @@ SCHEDULE_FILES = [
     {"file": "data/raw/day4.json", "date": "2025-11-04", "day": 4},
     {"file": "data/raw/day5.json", "date": "2025-11-05", "day": 5},
 ]
+
+def ensure_eastern(dt):
+    """Ensures naive datetimes are tagged explicitly as America/New_York."""
+    if dt is None:
+        return None
+    dt_naive = dt.replace(tzinfo=None)
+    return dt_naive.replace(tzinfo=EASTERN_TZ)
 
 def seed_database():
     print("Connecting to database...")
@@ -58,13 +68,21 @@ def seed_database():
                 events = data.get("events", data) if isinstance(data, dict) else data
 
             for raw_event in events:
-                print(f"Current event: {raw_event}")
                 raw_event['event_date'] = sf['date']
                 clean_event = StandardizedEvent.model_validate(raw_event)
 
-                # Handle events that start before midnight and end after midnight
+                # 1. Handle late-night events (12:00 AM - 5:59 AM) -> shift to next calendar day
+                if clean_event.start_time.hour < 6:
+                    clean_event.start_time += timedelta(days=1)
+                    clean_event.end_time += timedelta(days=1)
+
+                # 2. Handle events starting before midnight and ending after midnight
                 if clean_event.end_time < clean_event.start_time:
                     clean_event.end_time += timedelta(days=1)
+
+                # 3. Localize to Eastern Time
+                start_dt = ensure_eastern(clean_event.start_time)
+                end_dt = ensure_eastern(clean_event.end_time)
 
                 # Edge case overrides
                 if clean_event.location_name == "Manhattan Dining Deck 7 Aft":
@@ -88,14 +106,11 @@ def seed_database():
 
                 # Insert directly into individual tables
                 if clean_event.event_type == "performance":
-                    # Extract artist name from raw fields; if not exist, pull default event name
-                    # which should be a string with a singular artist's name.
-                    raw_artists = raw_event.get("artist_names") or raw_event.get("artist_name") or clean_event.event_name
-                    
-                    # Normalize string vs list into a unified list
+                    raw_artists = clean_event.event_name
+                    if not raw_artists:
+                        raw_artists = raw_event.get("artist_names") or raw_event.get("artist_name")
                     artist_name_list = [raw_artists] if isinstance(raw_artists, str) else raw_artists
 
-                    # Find or create every artist participating in this set
                     artists_for_perf = []
                     for name in artist_name_list:
                         artist = session.query(Artist).filter_by(name=name).first()
@@ -111,16 +126,14 @@ def seed_database():
                             session.flush()
                         artists_for_perf.append(artist)
 
-                    # Check for a title property in the JSON; else use the artist names w/ B2B in between
                     set_title = raw_event.get("title") or " B2B ".join([a.name for a in artists_for_perf])
 
-                    # Instantiate Performance with Many-to-Many relationship
                     perf = Performance(
                         title=set_title,
                         location_id=location.id,
-                        start_time=clean_event.start_time,
-                        end_time=clean_event.end_time,
-                        artists=artists_for_perf  # Performance can have >=1 artist
+                        start_time=start_dt,
+                        end_time=end_dt,
+                        artists=artists_for_perf
                     )
                     session.add(perf)
 
@@ -128,8 +141,8 @@ def seed_database():
                     act = Activity(
                         activity_name=clean_event.event_name,
                         location_id=location.id,
-                        start_time=clean_event.start_time,
-                        end_time=clean_event.end_time
+                        start_time=start_dt,
+                        end_time=end_dt
                     )
                     session.add(act)
 
@@ -137,8 +150,8 @@ def seed_database():
                     ann = Announcement(
                         announcement_name=clean_event.event_name,
                         location_id=location.id,
-                        start_time=clean_event.start_time,
-                        end_time=clean_event.end_time
+                        start_time=start_dt,
+                        end_time=end_dt
                     )
                     session.add(ann)
      

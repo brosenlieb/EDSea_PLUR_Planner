@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "../lib/api";
-import { getActivityLabel, formatTimeET } from "../lib/utils";
+import { getActivityLabel, formatTimeET, getFestivalDayInfo } from "../lib/utils";
 import { Artist, RecommendedArtist, EventSlot, ActivityPref, Activity } from "../types";
 
 export default function FestivalPlanner() {
@@ -49,110 +49,107 @@ export default function FestivalPlanner() {
 
 // Artist Selection
 function ArtistSelection({ favorites, setFavorites, activityPrefs, setActivityPrefs, onNext }: any) {
-    const [artists, setArtists] = useState<Artist[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
     api.getArtists()
-        .then((data: any) => {
-        
-        // Handle array vs wrapped response shapes
+      .then((data: any) => {
         const artistList = Array.isArray(data) 
-            ? data 
-            : data?.artists || data?.items || [];
+          ? data 
+          : data?.artists || data?.items || [];
 
         setArtists(artistList);
-        })
-        .catch((err) => {
+      })
+      .catch((err) => {
         console.error("--> API ERROR:", err);
-        setArtists([]); // Reset to empty array on error
-        })
-        .finally(() => {
+        setArtists([]);
+      })
+      .finally(() => {
         setLoading(false);
-        });
-    }, []);
+      });
+  }, []);
 
-    const toggleArtist = (artistId: string) => {
+  const toggleArtist = (artistId: string) => {
     setFavorites((prev: string[]) => {
-        if (prev.includes(artistId)) {
-        return prev.filter((id) => id !== artistId); // Deselect
-        }
-        if (prev.length < 5) {
-        return [...prev, artistId]; // Select if under limit
-        }
-        return prev; // Cap at 5 max
+      if (prev.includes(artistId)) {
+        return prev.filter((id) => id !== artistId);
+      }
+      // Raised cap from 5 to 10
+      if (prev.length < 10) {
+        return [...prev, artistId];
+      }
+      return prev;
     });
-    };
+  };
 
-    const isSelectionValid = favorites.length >= 3 && favorites.length <= 5;
-    const isMaxReached = favorites.length >= 5;
+  const isSelectionValid = favorites.length >= 3 && favorites.length <= 10;
+  const isMaxReached = favorites.length >= 10;
 
-    if (loading) return <p className="p-4 text-center">Loading artists...</p>;
+  if (loading) return <p className="p-4 text-center">Loading artists...</p>;
 
-    return (
-        <div className="max-w-4xl mx-auto p-4">
-        <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Select 3 to 5 Favorite Artists</h2>
-            <span className={`text-sm font-semibold ${isSelectionValid ? 'text-green-400' : 'text-amber-400'}`}>
-            Selected: {favorites.length} / 5 (Min 3)
-            </span>
-        </div>
+  return (
+    <div className="max-w-4xl mx-auto p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Select 3 to 10 Favorite Artists</h2>
+        <span className={`text-sm font-semibold ${isSelectionValid ? 'text-green-400' : 'text-amber-400'}`}>
+          Selected: {favorites.length} / 10 (Min 3)
+        </span>
+      </div>
 
-        {/* Scrollable grid container for ~40 items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-2 border border-gray-700 rounded-lg">
-            {artists.map((artist) => {
-            const idStr = artist.id.toString();
-            const isChecked = favorites.includes(idStr);
-            const isDisabled = !isChecked && isMaxReached;
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-2 border border-gray-700 rounded-lg">
+        {artists.map((artist) => {
+          const idStr = artist.id.toString();
+          const isChecked = favorites.includes(idStr);
+          const isDisabled = !isChecked && isMaxReached;
 
-            return (
-                <label
-                key={artist.id}
-                className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    isChecked
-                    ? 'bg-indigo-950 border-indigo-500 text-white'
-                    : isDisabled
-                    ? 'bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                }`}
-                >
-                <input
-                    type="checkbox"
-                    checked={isChecked}
-                    disabled={isDisabled}
-                    onChange={() => toggleArtist(artist.id.toString())}
-                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
-                />
-                <span className="font-medium text-sm select-none text-white">{artist.name}</span>
-                </label>
-            );
-            })}
-        </div>
-
-        <ActivitySelection 
-          activityPrefs={activityPrefs} 
-          setActivityPrefs={setActivityPrefs} 
-        />
-
-        {/* Progress & Next Step Trigger */}
-        <div className="flex justify-between items-center mt-6">
-            <p className="text-sm">Selected: {favorites.length} / 5 (Minimum 3)</p>
-            <button
-            disabled={!isSelectionValid}
-            onClick={onNext}
-            className="px-6 py-2 bg-blue-600 rounded disabled:opacity-50"
+          return (
+            <label
+              key={artist.id}
+              className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                isChecked
+                  ? 'bg-indigo-950 border-indigo-500 text-white'
+                  : isDisabled
+                  ? 'bg-gray-900 border-gray-800 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+              }`}
             >
-            Get Recommendations
-            </button>
-        </div>
-        </div>
-    );
+              <input
+                type="checkbox"
+                checked={isChecked}
+                disabled={isDisabled}
+                onChange={() => toggleArtist(artist.id.toString())}
+                className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer disabled:cursor-not-allowed"
+              />
+              <span className="font-medium text-sm select-none text-white">{artist.name}</span>
+            </label>
+          );
+        })}
+      </div>
+
+      <ActivitySelection 
+        activityPrefs={activityPrefs} 
+        setActivityPrefs={setActivityPrefs} 
+      />
+
+      <div className="flex justify-between items-center mt-6">
+        <p className="text-sm">Selected: {favorites.length} / 10 (Minimum 3)</p>
+        <button
+          disabled={!isSelectionValid}
+          onClick={onNext}
+          className="px-6 py-2 bg-blue-600 rounded disabled:opacity-50 text-white font-semibold"
+        >
+          Get Recommendations
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // Recommendation Grid
 function RecommendationGrid({ favorites, activityPrefs, onNext, onBack }: {
   favorites: string[]; activityPrefs: ActivityPref[]; onNext: () => void; onBack: () => void;
-  }) {
+}) {
   const [recs, setRecs] = useState<RecommendedArtist[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -181,7 +178,6 @@ function RecommendationGrid({ favorites, activityPrefs, onNext, onBack }: {
         <p className="text-gray-600">Note that Nice-to-Have activities will always lose to Must-Have Activities and all musical performances.</p>
       </div>
 
-      {/* Activity Summary Badge Bar */}
       {activityPrefs.length > 0 && (
         <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center justify-between">
           <span className="text-sm font-semibold text-indigo-900">Queued Activities:</span>
@@ -240,52 +236,118 @@ function Timetable({ favorites, activityPrefs, onBack }: {
         <p className="text-center py-10 animate-pulse">Solving constraints & travel matrix...</p>
       ) : (
         <div className="space-y-4">
-          {schedule.map((slot, index) => {
+          {schedule.map((slot: EventSlot, index: number) => {
             const isPerformance = slot.event_type === "performance";
+            const isAnnouncement = slot.category === "announcement";
+
+            let cardStyle = "bg-white border-gray-200";
+            let sidebarStyle = "bg-slate-800 text-white";
+            let badgeStyle = "bg-blue-100 text-blue-800";
+            let badgeText = "Music Set";
+
+            if (isAnnouncement) {
+              cardStyle = "bg-amber-50 border-amber-200";
+              sidebarStyle = "bg-amber-800 text-amber-100";
+              badgeStyle = "bg-amber-200 text-amber-900";
+              badgeText = "Announcement";
+            } else if (!isPerformance) {
+              cardStyle = "bg-emerald-50 border-emerald-200";
+              sidebarStyle = "bg-emerald-800 text-emerald-100";
+              badgeStyle = "bg-emerald-200 text-emerald-800";
+              badgeText = slot.category || "Activity";
+            }
+
+            const dateInfo = getFestivalDayInfo(slot.start_time);
+            const isNewDay = index === 0 || getFestivalDayInfo(schedule[index - 1].start_time).rawDate !== dateInfo.rawDate;
+
+            const nextSlot = index < schedule.length - 1 ? schedule[index + 1] : null;
+            const isNextAnnouncement = nextSlot && nextSlot.category === "announcement";
+            const isNextLocationNonActionable = nextSlot && (
+              !nextSlot.location_name ||
+              nextSlot.location_name === "All" ||
+              nextSlot.location_name === "All Locations" ||
+              nextSlot.location_name === "Shipwide / Informational"
+            );
+            
+            // Only show "Next up: Travel" if there isn't a massive gap
+            let gapMinutes = 0;
+            let showFreeTimeBlock = false;
+
+            if (nextSlot) {
+              const currentEndTime = new Date(slot.end_time).getTime();
+              const nextStartTime = new Date(nextSlot.start_time).getTime();
+              gapMinutes = Math.round((nextStartTime - currentEndTime) / 60000);
+              
+              const nextDateInfo = getFestivalDayInfo(nextSlot.start_time);
+
+              // Inject a Free Time block if the gap is >= 30 mins AND it's on the same festival day
+              if (gapMinutes >= 30 && dateInfo.rawDate === nextDateInfo.rawDate) {
+                showFreeTimeBlock = true;
+              }
+            }
+
+            const showTravelLine = nextSlot && !isNextAnnouncement && !isNextLocationNonActionable && !showFreeTimeBlock;
 
             return (
-              <div 
-                key={slot.id} 
-                className={`flex rounded-lg border shadow-sm overflow-hidden ${
-                  isPerformance ? "bg-white border-gray-200" : "bg-purple-50 border-purple-200"
-                }`}
-              >
-                {/* Time Sidebar — Uses formatTimeET to lock times to Eastern Time */}
-                <div className={`p-4 w-36 flex flex-col justify-center items-center shrink-0 ${
-                  isPerformance ? "bg-slate-800 text-white" : "bg-purple-900 text-purple-100"
-                }`}>
-                  <span className="font-bold text-sm">{formatTimeET(slot.start_time)}</span>
-                  <span className="text-xs opacity-75">to {formatTimeET(slot.end_time)}</span>
-                </div>
+              <div key={slot.id || index}>
+                {isNewDay && (
+                  <div className="pt-6 pb-2 border-b-2 border-indigo-500 mb-4 flex items-center justify-between">
+                    <h3 className="text-xl font-extrabold text-indigo-900">
+                      Day {dateInfo.dayNum} — {dateInfo.label}
+                    </h3>
+                  </div>
+                )}
 
-                {/* Event Details */}
-                <div className="p-4 flex-grow flex justify-between items-center">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-lg text-gray-900">
-                        {slot.title}
-                      </h3>
-                      <span className={`text-xs px-2 py-0.5 rounded font-semibold ${
-                        isPerformance 
-                          ? "bg-blue-100 text-blue-800" 
-                          : "bg-purple-200 text-purple-800"
-                      }`}>
-                        {isPerformance ? "Music Set" : slot.category || "Activity"}
-                      </span>
-                    </div>
+                <div className={`flex rounded-lg border shadow-sm overflow-hidden mb-3 ${cardStyle}`}>
+                  <div className={`p-4 w-36 flex flex-col justify-center items-center shrink-0 ${sidebarStyle}`}>
+                    <span className="font-bold text-sm">{formatTimeET(slot.start_time)}</span>
+                    <span className="text-xs opacity-75">to {formatTimeET(slot.end_time)}</span>
+                  </div>
 
-                    <p className="text-sm text-gray-600">
-                      {slot.stage_name ? `${slot.stage_name} • ` : ""}
-                      <span className="font-medium">{slot.location_name}</span>
-                    </p>
+                  <div className="p-4 flex-grow flex justify-between items-center">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-lg text-gray-900">
+                          {slot.title}
+                        </h3>
+                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${badgeStyle}`}>
+                          {badgeText}
+                        </span>
+                      </div>
 
-                    {index < schedule.length - 1 && (
-                      <p className="text-xs text-amber-600 mt-2 font-medium">
-                        Next up: Travel to {schedule[index + 1].location_name}
+                      <p className="text-sm text-gray-600">
+                        {slot.stage_name && slot.stage_name !== "n/a" ? `${slot.stage_name} • ` : ""}
+                        <span className="font-medium">{slot.location_name}</span>
                       </p>
-                    )}
+
+                      {showTravelLine && (
+                        <p className="text-xs text-amber-600 mt-2 font-medium">
+                          Next up: Travel to {nextSlot.location_name}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
+
+                {/* Injected Free Time Block */}
+                {showFreeTimeBlock && (
+                  <div className="flex rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 mb-3 overflow-hidden opacity-80">
+                    <div className="p-4 w-36 flex flex-col justify-center items-center shrink-0 text-gray-500">
+                      <span className="font-bold text-sm">{formatTimeET(slot.end_time)}</span>
+                      <span className="text-xs">to {formatTimeET(nextSlot!.start_time)}</span>
+                    </div>
+                    <div className="p-4 flex-grow flex items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500 font-semibold italic">Free Time</span>
+                        <span className="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
+                          {gapMinutes >= 60 
+                            ? `${Math.floor(gapMinutes / 60)} hr ${gapMinutes % 60} min` 
+                            : `${gapMinutes} min`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -295,6 +357,7 @@ function Timetable({ favorites, activityPrefs, onBack }: {
   );
 }
 
+// Activity Selection (Unrestricted selection)
 function ActivitySelection({
   activityPrefs,
   setActivityPrefs,
@@ -310,7 +373,6 @@ function ActivitySelection({
       .then((data: Activity[] | { activities: Activity[] }) => {
         const activityList = Array.isArray(data) ? data : data?.activities || [];
         setActivities(activityList);
-        console.log('Fetched activities:', data);
       })
       .catch((err) => {
         console.error("--> API ERROR fetching activities:", err);
@@ -362,12 +424,10 @@ function ActivitySelection({
 
           return (
             <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg bg-white shadow-sm mb-2">
-              {/* Activity Label displaying Name, Day, and Eastern Time Range */}
               <span className="text-sm font-medium text-gray-900 pr-4">
                 {getActivityLabel(activity)}
               </span>
 
-              {/* Your Priority Selector */}
               <select
                 value={currentPrefValue}
                 onChange={(e) => handlePriorityChange(activity.id, e.target.value)}

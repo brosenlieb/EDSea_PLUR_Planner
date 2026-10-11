@@ -4,6 +4,7 @@ from openai import OpenAI
 import os
 from ddgs import DDGS
 import json
+import re
 from dotenv import load_dotenv
 
 # Define the Structured Output Schema for EDM Taxonomy
@@ -13,41 +14,74 @@ class EDMEnrichment(BaseModel):
     mood_and_energy: str
     sonic_textures: str
 
+# Boilerplate patterns for SoundCloud, Bandcamp, and general media sites
+JUNK_PATTERNS = [
+    r"\b\d+([\.,]\d+)?\s*(followers|following|tracks|plays|likes|subscribers)\b",
+    r"tracks on (desktop|mobile|iOS|Android)",
+    r"discover followers on",
+    r"listen to (music|albums|songs|tracks) (online|for free)?",
+    r"(download|stream) in (mp3|flac|wav|24-bit)",
+    r"includes unlimited streaming via the free Bandcamp app",
+    r"name your price",
+    r"buy (digital|vinyl|cassette|album)",
+    r"all rights reserved",
+    r"stream tracks, albums, playlists",
+]
+
 load_dotenv()
 
 LEMONADE_URL = os.getenv("LEMONADE_AI_URL", "http://localhost:13305/v1")
 LEMONADE_API_KEY = os.getenv("LEMONADE_API_KEY", "sk-local-dummy-key")
-# 2. Configure the Local LLM Client
+# Configure the Local LLM Client
 client = OpenAI(
     base_url=LEMONADE_URL,
     api_key=LEMONADE_API_KEY
 )
 
+def sanitize_snippet(text: str) -> str:
+    """Strips platform marketing fluff and boilerplate from search snippets."""
+    if not text:
+        return ""
+        
+    sentences = re.split(r'(?<=[.!?]) +', text)
+    clean_sentences = []
+
+    for sentence in sentences:
+        if not any(re.search(pattern, sentence, re.IGNORECASE) for pattern in JUNK_PATTERNS):
+            clean_sentences.append(sentence.strip())
+
+    return " ".join(clean_sentences)
+
 def search_artist_info(artist_name: str) -> str:
-    # Fetches web snippets for an artist using DuckDuckGo.
-    query = f"{artist_name} electronic music genre bio sound soundcloud bandcamp"
+    # Exclude platform fluff sites, target high-signal music terms
+    query = f'"{artist_name}" EDM electronic music genre bio style -site:facebook.com -site:instagram.com -site:twitter.com -site:tiktok.com'
     print(f"  -> Searching web for: '{query}'...")
     
     try:
         results = DDGS().text(query, max_results=3)
         if not results:
             return "No specific web results found."
-        print(f"DDG Results: {results}")
         
-        # Combine titles and snippets into a clean context string
+        # Combine titles and sanitized snippets into a clean context string
         context_snippets = []
         for r in results:
-            context_snippets.append(f"Title: {r.get('title')}\nSnippet: {r.get('body')}")
+            title = r.get('title', '')
+            raw_body = r.get('body', '')
+            clean_body = sanitize_snippet(raw_body)
+            
+            if clean_body:
+                context_snippets.append(f"Title: {title}\nSnippet: {clean_body}")
         
+        if not context_snippets:
+            return "No specific web results found."
+            
         return "\n\n".join(context_snippets)
     except Exception as e:
-        # May add MusicBrainz integration here later.
         print(f"  -> Search error: {e}")
         return "Search failed."
 
 def enrich_database():
-    # 3. Connect to PostgreSQL
-    # connString built in pieces as special characters can break psychopg's parsing
+    # Connect to PostgreSQL
     conn = psycopg.connect(
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
@@ -57,7 +91,7 @@ def enrich_database():
     )
     cur = conn.cursor()
 
-    # 4. Target missing data, including string placeholders like "null"
+    # Target missing data, including string placeholders like "null"
     query = """
         SELECT id, name 
         FROM artists 
@@ -80,10 +114,13 @@ def enrich_database():
         web_context = search_artist_info(artist_name)
         if web_context == "No specific web results found." or web_context == "Search failed.":
             continue
+            
         schema_json = json.dumps(EDMEnrichment.model_json_schema(), indent=2)
 
+        # Updated prompt strictly forbidding reasoning steps
         full_prompt = f"""
-        "You are an expert electronic music taxonomist. Return ONLY valid JSON matching the schema."
+        "You are a fast EDM metadata extraction system. Do NOT analyze, explain, or output reasoning steps. Output ONLY the raw, minimal JSON matching the schema immediately."
+        
         Analyze the electronic dance music (EDM) artist '{artist_name}'. 
 
         Web Search Context:
@@ -103,7 +140,7 @@ def enrich_database():
         """
         
         try:
-            # 5. Call the local model using Structured Outputs.  Tuned format for Gemma.
+            # Call the local model using Structured Outputs and speed optimizations
             response = client.chat.completions.create(
                 model="gemma-4-12b-it-GGUF-UD-Q5_K_XL", 
                 messages=[
@@ -111,9 +148,9 @@ def enrich_database():
                 ],
                 response_format={
                     "type": "json_object",
-                    # "schema": EDMEnrichment.model_json_schema()
                 },
-                temperature=0.2
+                temperature=0.2,
+                max_tokens=1024
             )
 
             raw_json = response.choices[0].message.content
@@ -127,7 +164,7 @@ def enrich_database():
                 f"Sound: {data.sonic_textures}"
             )
             
-            # 6. Update the record in PostgreSQL
+            # Update the record in PostgreSQL
             cur.execute(
                 """
                 UPDATE artists 
@@ -137,7 +174,6 @@ def enrich_database():
                 (genre_field, description_field, artist_id)
             )
             
-            # Commit after each successful update so progress isn't lost if the script fails
             conn.commit()
             print(f"  -> Successfully updated metadata.")
             
