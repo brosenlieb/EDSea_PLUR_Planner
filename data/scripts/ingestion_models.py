@@ -2,8 +2,18 @@ from datetime import datetime, timedelta
 from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field, field_validator, ValidationInfo, AliasChoices, model_validator
 
-# Accept several different forms of inputs
 class RawEventInput(BaseModel):
+    """
+    Pydantic model for validating raw event inputs from festival schedule JSON files.
+
+    Attributes:
+        location_name: The name of the location or area.
+        event_name: The name of the artist or event.
+        stage_name: The specific stage or venue.
+        event_date: The date of the event (populated by seed_db).
+        start_time: The start time of the event.
+        end_time: The end time of the event.
+    """
     location_name: Optional[str] = Field(
         default="Shipwide", 
         validation_alias=AliasChoices("location_name", "location", "area"),
@@ -34,6 +44,15 @@ class RawEventInput(BaseModel):
     @field_validator("stage_name", "event_name", "location_name", mode="before")
     @classmethod
     def normalize_casing(cls, v: Union[str, list[str], None]) -> Union[str, list[str], None]:
+        """
+        Normalize casing for text fields, handling acronyms and title casing.
+
+        Args:
+            v: The input string or list of strings.
+
+        Returns:
+            The normalized string or list of strings.
+        """
         def _clean(text: str) -> str:
             text = text.strip().title()
             acronyms = {"W/": "w/", "It'S": "It's", "Oguz": "OGUZ", "Og": "OG", "Edsea": "EDSea",
@@ -51,6 +70,23 @@ class RawEventInput(BaseModel):
     @field_validator("start_time", "end_time", mode="before")
     @classmethod
     def parse_time_string(cls, v: str | datetime, info: ValidationInfo) -> Optional[datetime]:
+        """
+        Parse time strings into datetime objects.
+
+        Handles various formats including '5:30PM', '05:30 PM', ISO strings,
+        and special 'none' values. Uses 'event_date' from validation info
+        as the base date.
+
+        Args:
+            v: The time string or datetime object.
+            info: Validation info containing 'event_date'.
+
+        Returns:
+            A parsed datetime object, or None if input is None or a 'none' string.
+
+        Raises:
+            ValueError: If the time string cannot be parsed.
+        """
         # Pass through None values to be handled by finalize_timestamps
         if v is None:
             return None
@@ -91,6 +127,15 @@ class RawEventInput(BaseModel):
 
     @model_validator(mode="after")
     def finalize_timestamps(self) -> "RawEventInput":
+        """
+        Finalize timestamps after field-level parsing.
+
+        Sets a default duration of 15 minutes if end_time is missing.
+        Adjusts end_time to the next day if it is earlier than start_time.
+
+        Returns:
+            The validated and modified instance.
+        """
         # After field-level parsing, check for missing end_times and set them to 15 minutes
         # after the event's start_time.
         if self.end_time is None and self.start_time is not None:
@@ -104,12 +149,26 @@ class RawEventInput(BaseModel):
 
 # Allow for other time-event types besides just musical performances
 class StandardizedEvent(RawEventInput):
+    """
+    Extended model for standardizing festival events, including classification.
+    
+    Inherits from RawEventInput and adds event type classification
+    (performance, activity, announcement) based on event name patterns.
+    """
     # Derived fields added after validation
     event_type: Literal["performance", "activity", "announcement"] = "performance"
     
     # Classify the event type based on text patterns
     @model_validator(mode="after")
     def classify_event(self) -> "StandardizedEvent":
+        """
+        Classify the event type based on keywords in the event name.
+
+        Sets the `event_type` field to 'announcement', 'activity', or 'performance'.
+
+        Returns:
+            The model instance with updated event_type.
+        """
         # Flattens artist list for B2B performances w/ multiple artists
         if isinstance(self.event_name, list):
             entity = " ".join(self.event_name).lower()

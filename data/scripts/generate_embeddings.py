@@ -18,7 +18,15 @@ DATABASE_URL = os.getenv("DB_URL", "postgresql://admin:password@localhost:5432/m
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-async def embed_artists():
+async def embed_artists() -> None:
+    """Generate embeddings for all artists in the database.
+
+    Queries the database for all artists, generates text embeddings
+    using the Lemonade AI model, and saves them back to the database.
+
+    Raises:
+        Exception: If an error occurs during the embedding generation or database save.
+    """
     session = SessionLocal()
     try:
         # Use this to only fetch artists that don't have an embedding yet.   

@@ -7,7 +7,22 @@ def generate_optimal_schedule(
     travel_matrix: Dict[tuple[str, str], int], 
     favorite_artist_ids: List[int]
 ) -> List[Dict[str, Any]]:
+    """Generate an optimal schedule based on events, travel times, and preferences.
     
+    Uses Google OR-Tools Constraint Programming solver to maximize user satisfaction
+    by selecting a subset of events that do not conflict in time or location.
+
+    Args:
+        events: A list of event dictionaries containing 'id', 'start_time', 'end_time',
+            'location_name', 'artist_ids', and 'event_type'.
+        travel_matrix: A dictionary mapping location pairs (tuples of strings) to
+            travel time in minutes.
+        favorite_artist_ids: A list of artist IDs representing the user's preferences.
+
+    Returns:
+        A list of selected event dictionaries sorted by start_time.
+    """
+
     # Pre-processing: Calculate rarity counts for artists
     artist_set_counts = {}
     for ev in events:

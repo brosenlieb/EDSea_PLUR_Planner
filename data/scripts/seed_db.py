@@ -7,7 +7,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Optional
 from zoneinfo import ZoneInfo
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -35,14 +36,33 @@ SCHEDULE_FILES = [
     {"file": "data/raw/day5.json", "date": "2025-11-05", "day": 5},
 ]
 
-def ensure_eastern(dt):
-    """Ensures naive datetimes are tagged explicitly as America/New_York."""
+def ensure_eastern(dt: Optional[datetime]) -> Optional[datetime]:
+    """
+    Tag naive datetimes with the America/New_York timezone.
+
+    Args:
+        dt: A datetime object, potentially naive or timezone-aware.
+
+    Returns:
+        The datetime object with 'America/New_York' timezone, or None if input is None.
+    """
     if dt is None:
         return None
     dt_naive = dt.replace(tzinfo=None)
     return dt_naive.replace(tzinfo=EASTERN_TZ)
 
-def seed_database():
+def seed_database() -> None:
+    """
+    Main entry point for seeding the database with festival schedule data.
+
+    Clears the public schema, creates tables, and populates them with
+    Locations, Artists, Performances, Activities, and Announcements based
+    on JSON data in the 'data/raw' directory.
+
+    Raises:
+        ValueError: If the DATABASE_URL environment variable is not set.
+        Exception: If a database operation fails.
+    """
     print("Connecting to database...")
     
     with engine.connect() as conn:
