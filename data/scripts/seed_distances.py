@@ -18,7 +18,20 @@ DATABASE_URL = os.getenv("DB_URL", "postgresql://admin:password@localhost:5432/m
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-def seed_location_distances():
+def seed_location_distances() -> None:
+    """
+    Seed the 'location_distances' table with directional travel times.
+
+    Reads distance data from 'data/raw/location_distances.json', handles
+    specific security screening time adjustments for 'Harvest Caye Beach',
+    and populates the database.
+
+    Returns:
+        None.
+
+    Raises:
+        Exception: If a database error occurs during seeding.
+    """
     session = SessionLocal()
     json_path = PROJECT_ROOT / "data" / "raw" / "location_distances.json"
     

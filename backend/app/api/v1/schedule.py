@@ -1,19 +1,22 @@
+from typing import Any, List, Optional
+
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session, selectinload, joinedload
-from backend.app.schemas.api_models import ScheduleRequest, EventSlot
+from sqlalchemy.orm import Session, joinedload, selectinload
+from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta, timezone
+
 from backend.app.api.deps import get_db
 from backend.app.core.recommendation import get_recommendations
 from backend.app.core.solver import generate_optimal_schedule
 from backend.app.db.models import Performance, Activity, LocationDistance, Announcement
-from zoneinfo import ZoneInfo
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from backend.app.schemas.api_models import ScheduleRequest, EventSlot
 
 router = APIRouter()
 
 EASTERN_TZ = ZoneInfo("America/New_York")
 
-def to_eastern(dt: datetime | None) -> datetime | None:
+
+def to_eastern(dt: Optional[datetime]) -> Optional[datetime]:
     """Converts a database datetime to Eastern Time wall-clock time.
 
     Args:
@@ -42,6 +45,7 @@ def to_eastern(dt: datetime | None) -> datetime | None:
 
     return dt_eastern
 
+
 def get_location_name(entity: Any, default: str) -> str:
     """Extracts the location name from an entity object, returning a default value if not found.
 
@@ -57,8 +61,12 @@ def get_location_name(entity: Any, default: str) -> str:
         return getattr(entity.location, "location_name", None) or default
     return default
 
-@router.post("/schedule/generate", response_model=list[EventSlot])
-def generate_schedule(payload: ScheduleRequest, db: Session = Depends(get_db)) -> list[EventSlot]:
+
+@router.post("/schedule/generate", response_model=List[EventSlot])
+def generate_schedule(
+    payload: ScheduleRequest, 
+    db: Session = Depends(get_db)
+) -> List[EventSlot]:
     """Generates an optimized festival schedule based on user preferences and AI recommendations.
 
     This function retrieves performances, selected activities, and announcements,
