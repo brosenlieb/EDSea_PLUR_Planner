@@ -9,11 +9,35 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # Persists the database data on your local machine
       - postgres_data:/var/lib/postgresql/data
-      # Maps your initialization script into the container
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: festival_backend
+    environment:
+      # Dynamically inject the database URL using your existing .env variables
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      EASTERN_TZ: America/New_York
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: festival_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
