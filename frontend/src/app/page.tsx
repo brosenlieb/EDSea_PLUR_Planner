@@ -216,11 +216,15 @@ function Timetable({ favorites, activityPrefs, onBack }: {
   favorites: string[]; activityPrefs: ActivityPref[]; onBack: () => void
 }) {
   const [schedule, setSchedule] = useState<EventSlot[]>([]);
+  const [shareSlug, setShareSlug] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.generateSchedule(favorites, activityPrefs)
-      .then(setSchedule)
+      .then((data) => {
+        setSchedule(data.events); // Extract the event slots list
+        setShareSlug(data.slug);   // Store the unique hash slug
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [favorites, activityPrefs]);

@@ -1,6 +1,10 @@
+import hashlib
+import json
+import secrets
 from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session, joinedload, selectinload
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta, timezone
@@ -8,13 +12,17 @@ from datetime import datetime, timedelta, timezone
 from backend.app.api.deps import get_db
 from backend.app.core.recommendation import get_recommendations
 from backend.app.core.solver import generate_optimal_schedule
-from backend.app.db.models import Performance, Activity, LocationDistance, Announcement
-from backend.app.schemas.api_models import ScheduleRequest, EventSlot
+from backend.app.db.models import Performance, Activity, LocationDistance, Announcement, SavedSchedule
+from backend.app.schemas.api_models import ScheduleRequest, EventSlot, ScheduleResponse
+
+# Note: You will need to add ScheduleResponse to your schemas/api_models.py
+# class ScheduleResponse(BaseModel):
+#     slug: str
+#     events: List[EventSlot]
 
 router = APIRouter()
 
 EASTERN_TZ = ZoneInfo("America/New_York")
-
 
 def to_eastern(dt: Optional[datetime]) -> Optional[datetime]:
     """Converts a database datetime to Eastern Time wall-clock time.
@@ -61,31 +69,28 @@ def get_location_name(entity: Any, default: str) -> str:
         return getattr(entity.location, "location_name", None) or default
     return default
 
-
-@router.post("/schedule/generate", response_model=List[EventSlot])
+@router.post("/schedule/generate") # Recommended to add response_model=ScheduleResponse
 def generate_schedule(
     payload: ScheduleRequest, 
     db: Session = Depends(get_db)
-) -> List[EventSlot]:
-    """Generates an optimized festival schedule based on user preferences and AI recommendations.
+):
+    """Generates an optimized festival schedule, utilizing database caching for identical inputs."""
+    
+    # 1. Generate deterministic hash of the sorted payload
+    payload_dict = payload.model_dump() if hasattr(payload, 'model_dump') else payload.dict()
+    payload_str = json.dumps(payload_dict, sort_keys=True)
+    preferences_hash = hashlib.sha256(payload_str.encode("utf-8")).hexdigest()
 
-    This function retrieves performances, selected activities, and announcements,
-    runs a constraint solver to optimize the schedule, and returns a chronologically
-    sorted list of event slots.
+    # 2. Check the database for an existing schedule cache hit
+    cached_schedule = db.query(SavedSchedule).filter(SavedSchedule.preferences_hash == preferences_hash).first()
+    if cached_schedule:
+        return {"slug": cached_schedule.slug, "events": cached_schedule.schedule_data}
 
-    Args:
-        payload: The request containing favorite artist IDs and activity preferences.
-        db: The database session used to fetch performances, activities, and distances.
-
-    Returns:
-        A list of sorted, optimized event slots for the user's schedule.
-    """
-    # Grab AI recommendations
+    # 3. Cache Miss: Proceed with fetching data and running the solver
     recommended_artists = get_recommendations(db, payload.favorite_artist_ids, limit=10)
     recommended_ids = [a.id for a in recommended_artists]
     target_artist_ids = set(payload.favorite_artist_ids + recommended_ids)
     
-    # Fetch Performances
     db_performances = (
         db.query(Performance)
         .options(
@@ -97,7 +102,6 @@ def generate_schedule(
     
     events_for_solver = []
     
-    # Format Performances for solver
     for p in db_performances:
         p_artist_ids = [a.id for a in p.artists]
         
@@ -119,9 +123,8 @@ def generate_schedule(
             "artist_ids": p_artist_ids,
         })
 
-    # Fetch & Format Activities based on user preferences
     activity_prefs = {
-        pref.activity_id: pref.priority 
+        pref.activity_id: pref.priority
         for pref in payload.activity_preferences
     } if hasattr(payload, 'activity_preferences') else {}
 
@@ -146,29 +149,25 @@ def generate_schedule(
                 "priority": activity_prefs.get(a.id)
             })
         
-    # Fetch the travel matrix
     distances = db.query(LocationDistance).all()
     travel_matrix = {
         (d.location_a, d.location_b): d.distance_minutes
         for d in distances
     }
     
-    # Run the constraint solver ONLY on performances & user-selected activities
     solved_schedule = generate_optimal_schedule(
         events=events_for_solver,
         travel_matrix=travel_matrix,
         favorite_artist_ids=payload.favorite_artist_ids
     )
     
-    # Fetch Announcements (bypassing the solver)
     db_announcements = db.query(Announcement).options(joinedload(Announcement.location)).all()
 
     announcement_slots = []
     for ann in db_announcements:
-        # Read announcement_name directly from the DB model with fallbacks
         ann_title = (
-            getattr(ann, 'announcement_name', None) 
-            or getattr(ann, 'title', None) 
+            getattr(ann, 'announcement_name', None)
+            or getattr(ann, 'title', None)
             or "Announcement"
         )
 
@@ -184,14 +183,26 @@ def generate_schedule(
             "stage_name": ann.location.stage_name if ann.location else None,
         })
 
-    # Merge solved results with announcements
     full_schedule = list(solved_schedule) + announcement_slots
 
-    # Sort chronologically by start_time
     def get_start_key(item):
         st = item["start_time"] if isinstance(item, dict) else item.start_time
         return st.isoformat() if hasattr(st, 'isoformat') else str(st)
 
     full_schedule.sort(key=get_start_key)
 
-    return full_schedule
+    # 4. Save the new solved schedule into the database cache
+    new_slug = secrets.token_urlsafe(6)[:8]
+    schedule_json_data = jsonable_encoder(full_schedule)
+    
+    new_saved_schedule = SavedSchedule(
+        slug=new_slug,
+        preferences_hash=preferences_hash,
+        input_payload=payload_dict,
+        schedule_data=schedule_json_data
+    )
+    
+    db.add(new_saved_schedule)
+    db.commit()
+
+    return {"slug": new_slug, "events": full_schedule}

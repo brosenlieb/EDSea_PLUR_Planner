@@ -5,9 +5,10 @@ This module defines the SQLAlchemy ORM models representing the database schema
 for the Festival Planner application. It includes models for locations, artists,
 performances, activities, announcements, and location distances.
 """
-from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, UniqueConstraint, JSON
 from sqlalchemy.orm import declarative_base, relationship
 from pgvector.sqlalchemy import Vector
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -158,3 +159,13 @@ class LocationDistance(Base):
     location_a = Column(String, index=True)
     location_b = Column(String, index=True)
     distance_minutes = Column(Integer)
+
+class SavedSchedule(Base):
+    __tablename__ = "saved_schedules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    slug = Column(String(12), unique=True, index=True, nullable=False)         # e.g., "8f9a2b" for share links
+    preferences_hash = Column(String(64), index=True, nullable=False)         # SHA-256 of sorted user preferences
+    input_payload = Column(JSON, nullable=False)                              # Raw user input (artists, constraints)
+    schedule_data = Column(JSON, nullable=False)                              # Final calculated OR-Tools output
+    created_at = Column(DateTime, default=datetime.utcnow)
