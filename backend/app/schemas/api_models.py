@@ -95,6 +95,17 @@ class PerformanceSlot(BaseModel):
     start_time: datetime
     end_time: datetime
 
+class ScheduleResponse(BaseModel):
+    """
+    Response schema for the generated schedule.
+
+    Attributes:
+        slug (str): The unique identifier for sharing the schedule.
+        events (List[EventSlot]): The list of generated schedule events.
+    """
+    slug: str
+    events: List[EventSlot]
+
 class EventSlot(BaseModel):
     """
     Schema representing an event slot (performance or activity).
