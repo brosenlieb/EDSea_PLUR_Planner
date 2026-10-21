@@ -64,5 +64,4 @@ async def embed_artists() -> None:
         session.close()
 
 if __name__ == "__main__":
-    # Because we are using an async function, we run it via asyncio
     asyncio.run(embed_artists())

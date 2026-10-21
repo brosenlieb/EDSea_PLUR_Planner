@@ -53,33 +53,50 @@ def sanitize_snippet(text: str) -> str:
 
     return " ".join(clean_sentences)
 
-def search_artist_info(artist_name: str) -> str:
-    # Exclude platform fluff sites, target high-signal music terms
-    query = f'"{artist_name}" EDM electronic music genre bio style -site:facebook.com -site:instagram.com -site:twitter.com -site:tiktok.com'
+EXCLUDED_DOMAINS = ("facebook.com", "instagram.com", "twitter.com", "x.com", "tiktok.com",
+                    "wikipedia.org")
+
+def search_artist_info(artist_name: str, ddgs_session: DDGS = None) -> str:
+    query = f'"{artist_name}" EDM electronic music bio genre style'
     print(f"  -> Searching web for: '{query}'...")
     
+    # Reuse session if provided, otherwise create one
+    ddgs = ddgs_session if ddgs_session else DDGS()
+
     try:
-        results = DDGS().text(query, max_results=3)
+        # Request a few extra results so we can filter fluff domains client-side
+        results = list(ddgs.text(query, max_results=8))
+        # may need to use .extract in place of .text in future for deeper results
         if not results:
             return "No specific web results found."
         
-        # Combine titles and sanitized snippets into a clean context string
         context_snippets = []
         for r in results:
+            href = r.get('href', '').lower()
+            
+            # Filter platform fluff sites client-side
+            if any(domain in href for domain in EXCLUDED_DOMAINS):
+                continue
+                
             title = r.get('title', '')
             raw_body = r.get('body', '')
             clean_body = sanitize_snippet(raw_body)
             
             if clean_body:
                 context_snippets.append(f"Title: {title}\nSnippet: {clean_body}")
+            
+            # Stop once we have 5 good quality snippets
+            if len(context_snippets) == 5:
+                break
         
         if not context_snippets:
             return "No specific web results found."
             
         return "\n\n".join(context_snippets)
+
     except Exception as e:
         print(f"  -> Search error: {e}")
-        time.sleep(5) # Prevent spamming/rate limit errors for repeated missed searched
+        time.sleep(5)  # Throttling pause on failure
         return "Search failed."
 
 def enrich_database():

@@ -17,6 +17,7 @@ app = FastAPI(title="Festival Planner API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://pl-3b3e63c4bf0d45c2b9e1f68f654409d1.ecs.us-east-1.on.aws",
         "http://localhost:3000", 
         "http://127.0.0.1:3000"
     ], 
