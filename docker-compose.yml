@@ -28,7 +28,7 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload # Enable hot-reload
     environment:
       # Dynamically inject the database URL using your existing .env variables
-      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      DB_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       EASTERN_TZ: America/New_York
     ports:
       - "8000:8000"

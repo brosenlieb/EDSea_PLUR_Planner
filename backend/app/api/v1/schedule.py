@@ -9,11 +9,11 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta, timezone
 
-from backend.app.api.deps import get_db
-from backend.app.core.recommendation import get_recommendations
-from backend.app.core.solver import generate_optimal_schedule
-from backend.app.db.models import Performance, Activity, LocationDistance, Announcement, SavedSchedule
-from backend.app.schemas.api_models import ScheduleRequest, EventSlot, ScheduleResponse
+from app.api.deps import get_db
+from app.core.recommendation import get_recommendations
+from app.core.solver import generate_optimal_schedule
+from app.db.models import Performance, Activity, LocationDistance, Announcement, SavedSchedule
+from app.schemas.api_models import ScheduleRequest, EventSlot, ScheduleResponse
 
 # Note: You will need to add ScheduleResponse to your schemas/api_models.py
 # class ScheduleResponse(BaseModel):

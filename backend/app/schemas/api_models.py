@@ -4,7 +4,7 @@ Pydantic models for API request and response schemas.
 This module defines the data models used for validation and serialization
 within the Festival Planner API.
 """
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, ConfigDict
 from typing import List, Optional, Literal, Dict, Any
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -95,17 +95,6 @@ class PerformanceSlot(BaseModel):
     start_time: datetime
     end_time: datetime
 
-class ScheduleResponse(BaseModel):
-    """
-    Response schema for the generated schedule.
-
-    Attributes:
-        slug (str): The unique identifier for sharing the schedule.
-        events (List[EventSlot]): The list of generated schedule events.
-    """
-    slug: str
-    events: List[EventSlot]
-
 class EventSlot(BaseModel):
     """
     Schema representing an event slot (performance or activity).
@@ -164,3 +153,23 @@ class EventSlot(BaseModel):
         Configuration for the Pydantic model.
         """
         from_attributes = True
+
+class ScheduleResponse(BaseModel):
+    """
+    Response schema for the generated schedule.
+
+    Attributes:
+        slug (str): The unique identifier for sharing the schedule.
+        events (List[EventSlot]): The list of generated schedule events.
+    """
+    slug: str
+    events: List[EventSlot]
+
+class ActivitySchema(BaseModel):
+    id: int
+    activity_name: str
+    location_id: int
+    start_time: datetime
+    end_time: datetime
+
+    model_config = ConfigDict(from_attributes=True)
