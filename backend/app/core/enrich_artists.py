@@ -6,6 +6,7 @@ from ddgs import DDGS
 import json
 import re
 from dotenv import load_dotenv
+import time
 
 # Define the Structured Output Schema for EDM Taxonomy
 class EDMEnrichment(BaseModel):
@@ -78,6 +79,7 @@ def search_artist_info(artist_name: str) -> str:
         return "\n\n".join(context_snippets)
     except Exception as e:
         print(f"  -> Search error: {e}")
+        time.sleep(5) # Prevent spamming/rate limit errors for repeated missed searched
         return "Search failed."
 
 def enrich_database():
@@ -114,7 +116,9 @@ def enrich_database():
         web_context = search_artist_info(artist_name)
         if web_context == "No specific web results found." or web_context == "Search failed.":
             continue
-            
+
+        print(f"  -> Search Context: \n{web_context}")
+
         schema_json = json.dumps(EDMEnrichment.model_json_schema(), indent=2)
 
         # Updated prompt strictly forbidding reasoning steps

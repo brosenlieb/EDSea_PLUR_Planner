@@ -3,13 +3,14 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from backend.app.api.deps import get_db
-from backend.app.db.models import Activity
+from app.api.deps import get_db
+from app.db.models import Activity
+from app.schemas.api_models import ActivitySchema
 
 router = APIRouter()
 
 
-@router.get("/activities")
+@router.get("/activities", response_model=List[ActivitySchema])
 def get_activities(db: Session = Depends(get_db)) -> List[Activity]:
     """Retrieve all activities from the database.
 

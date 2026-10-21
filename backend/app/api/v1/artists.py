@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from backend.app.api.deps import get_db
-from backend.app.db.models import Artist
-from backend.app.schemas.api_models import ArtistResponse
+from app.api.deps import get_db
+from app.db.models import Artist
+from app.schemas.api_models import ArtistResponse
 
 router = APIRouter()
 

@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
 
-from backend.app.api.v1 import recommend, schedule, artists, activities
+from app.api.v1 import recommend, schedule, artists, activities
 
 app = FastAPI(title="Festival Planner API", version="1.0.0")
 

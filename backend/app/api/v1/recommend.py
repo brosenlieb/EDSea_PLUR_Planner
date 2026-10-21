@@ -3,9 +3,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from backend.app.api.deps import get_db
-from backend.app.core.recommendation import get_recommendations
-from backend.app.schemas.api_models import RecommendationRequest, RecommendedArtist
+from app.api.deps import get_db
+from app.core.recommendation import get_recommendations
+from app.schemas.api_models import RecommendationRequest, RecommendedArtist
 
 router = APIRouter()
 
