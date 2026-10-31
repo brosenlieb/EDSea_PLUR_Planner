@@ -1,3 +1,4 @@
+// frontend/src/lib/utils.ts
 import { Activity } from "@/types";
 
 const FESTIVAL_START_DATE_STR = "2025-11-01";
@@ -30,16 +31,13 @@ export function getFestivalDayInfo(isoString: string) {
   const eventDate = new Date(isoString);
   if (isNaN(eventDate.getTime())) return { dayNum: 1, label: "Day 1", rawDate: "" };
 
-  // Convert to Eastern Date components
+  // 1. Get exact Eastern Time date and hour
   const easternDateStr = eventDate.toLocaleDateString("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   });
-
-  const [m, d, y] = easternDateStr.split("/");
-  const localEasternDate = new Date(`${y}-${m}-${d}T00:00:00`);
 
   const hoursET = parseInt(
     eventDate.toLocaleTimeString("en-US", {
@@ -50,22 +48,31 @@ export function getFestivalDayInfo(isoString: string) {
     10
   );
 
+  const [m, d, y] = easternDateStr.split("/").map(Number);
+  
+  // Use UTC Date object so server & client perform math identically
+  const localEasternDate = new Date(Date.UTC(y, m - 1, d));
+
   // Late-night sets (12:00 AM - 5:59 AM ET) belong to previous day
   if (hoursET < 6) {
-    localEasternDate.setDate(localEasternDate.getDate() - 1);
+    localEasternDate.setUTCDate(localEasternDate.getUTCDate() - 1);
   }
 
-  const formattedY = localEasternDate.getFullYear();
-  const formattedM = String(localEasternDate.getMonth() + 1).padStart(2, "0");
-  const formattedD = String(localEasternDate.getDate()).padStart(2, "0");
+  const formattedY = localEasternDate.getUTCFullYear();
+  const formattedM = String(localEasternDate.getUTCMonth() + 1).padStart(2, "0");
+  const formattedD = String(localEasternDate.getUTCDate()).padStart(2, "0");
   const rawDate = `${formattedY}-${formattedM}-${formattedD}`;
 
-  const startDate = new Date(`${FESTIVAL_START_DATE_STR}T00:00:00`);
+  const [startY, startM, startD] = FESTIVAL_START_DATE_STR.split("-").map(Number);
+  const startDate = new Date(Date.UTC(startY, startM - 1, startD));
+  
   const diffTime = localEasternDate.getTime() - startDate.getTime();
   const dayNum = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
   const validDay = !isNaN(dayNum) && dayNum > 0 ? dayNum : 1;
 
+  // Format label locked to UTC to match localEasternDate across environments
   const label = localEasternDate.toLocaleDateString("en-US", {
+    timeZone: "UTC",
     weekday: "long",
     month: "short",
     day: "numeric",
