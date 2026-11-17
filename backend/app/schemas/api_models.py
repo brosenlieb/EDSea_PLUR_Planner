@@ -145,7 +145,6 @@ class EventSlot(BaseModel):
         """
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=ZoneInfo("UTC"))
-        # Returns ISO 8601 string with Eastern offset (-04:00 or -05:00)
         return dt.astimezone(EASTERN_TZ).isoformat()
     
     class Config:
@@ -171,5 +170,29 @@ class ActivitySchema(BaseModel):
     location_id: int
     start_time: datetime
     end_time: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class SavedScheduleResponse(BaseModel):
+    """
+    Schema representing a saved schedule record from the database.
+
+    This model is used for serializing saved schedule data in API responses,
+    particularly for admin endpoints or detailed schedule views.
+
+    Attributes:
+        id (int): The unique database identifier for the saved schedule.
+        slug (str): The unique short identifier for shareable links (e.g., "8f9a2b").
+        preferences_hash (str): SHA-256 hash of the user's sorted preferences for cache lookups.
+        input_payload (Dict[str, Any]): The raw user input used to generate the schedule.
+        schedule_data (List[Dict[str, Any]]): The final calculated schedule events from the OR-Tools solver.
+        created_at (datetime): The timestamp when the schedule was saved.
+    """
+    id: int
+    slug: str
+    preferences_hash: str
+    input_payload: Dict[str, Any]
+    schedule_data: List[Dict[str, Any]]
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

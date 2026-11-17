@@ -3,7 +3,7 @@ import json
 import secrets
 from typing import Any, List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session, joinedload, selectinload
 from zoneinfo import ZoneInfo
@@ -14,6 +14,7 @@ from app.core.recommendation import get_recommendations
 from app.core.solver import generate_optimal_schedule
 from app.db.models import Performance, Activity, LocationDistance, Announcement, SavedSchedule
 from app.schemas.api_models import ScheduleRequest, EventSlot, ScheduleResponse
+from app.crud.crud_schedule import create_saved_schedule, get_saved_schedule_by_slug, get_saved_schedule_by_preferences_hash
 
 # Note: You will need to add ScheduleResponse to your schemas/api_models.py
 # class ScheduleResponse(BaseModel):
@@ -69,24 +70,37 @@ def get_location_name(entity: Any, default: str) -> str:
         return getattr(entity.location, "location_name", None) or default
     return default
 
-@router.post("/schedule/generate") # Recommended to add response_model=ScheduleResponse
+@router.get("/schedule/{slug}", response_model=ScheduleResponse)
+def get_schedule_by_slug(slug: str, db: Session = Depends(get_db)):
+    """Retrieves a cached schedule by its unique slug."""
+    cached_schedule = get_saved_schedule_by_slug(db=db, slug=slug)
+    
+    if not cached_schedule:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    
+    return {
+        "slug": cached_schedule.slug,
+        "events": cached_schedule.schedule_data
+    }
+
+@router.post("/schedule/generate")
 def generate_schedule(
     payload: ScheduleRequest, 
     db: Session = Depends(get_db)
 ):
     """Generates an optimized festival schedule, utilizing database caching for identical inputs."""
     
-    # 1. Generate deterministic hash of the sorted payload
+    # Generate deterministic hash of the sorted payload
     payload_dict = payload.model_dump() if hasattr(payload, 'model_dump') else payload.dict()
     payload_str = json.dumps(payload_dict, sort_keys=True)
     preferences_hash = hashlib.sha256(payload_str.encode("utf-8")).hexdigest()
 
-    # 2. Check the database for an existing schedule cache hit
-    cached_schedule = db.query(SavedSchedule).filter(SavedSchedule.preferences_hash == preferences_hash).first()
+    # Check the database for an existing schedule cache hit
+    cached_schedule = get_saved_schedule_by_preferences_hash(db=db, preferences_hash=preferences_hash)
     if cached_schedule:
         return {"slug": cached_schedule.slug, "events": cached_schedule.schedule_data}
 
-    # 3. Cache Miss: Proceed with fetching data and running the solver
+    # Cache Miss: Proceed with fetching data and running the solver
     recommended_artists = get_recommendations(db, payload.favorite_artist_ids, limit=10)
     recommended_ids = [a.id for a in recommended_artists]
     target_artist_ids = set(payload.favorite_artist_ids + recommended_ids)
@@ -195,14 +209,12 @@ def generate_schedule(
     new_slug = secrets.token_urlsafe(6)[:8]
     schedule_json_data = jsonable_encoder(full_schedule)
     
-    new_saved_schedule = SavedSchedule(
+    new_saved_schedule = create_saved_schedule(
+        db=db,
         slug=new_slug,
         preferences_hash=preferences_hash,
         input_payload=payload_dict,
         schedule_data=schedule_json_data
     )
     
-    db.add(new_saved_schedule)
-    db.commit()
-
     return {"slug": new_slug, "events": full_schedule}

@@ -39,12 +39,18 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev # Use the dev Dockerfile
     container_name: festival_frontend
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1 # Used by browser
+      INTERNAL_API_URL: http://backend:8000/api/v1 # Used by Next.js server
+      WATCHPACK_POLLING: "true" # Ensures hot-reload works reliably inside Docker
     ports:
       - "3000:3000"
+    volumes:
+      - ./frontend:/app             # Sync local code changes to the container
+      - /app/node_modules           # Prevent local node_modules from overwriting the container's
+      - /app/.next                  # Keep Next.js build cache inside the container
     depends_on:
       - backend
 

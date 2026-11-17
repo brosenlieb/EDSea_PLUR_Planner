@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { api } from "../lib/api";
 import { getActivityLabel, formatTimeET, getFestivalDayInfo } from "../lib/utils";
 import { Artist, RecommendedArtist, EventSlot, ActivityPref, Activity } from "../types";
+import Timetable from '../components/timetable';
+
 
 export default function FestivalPlanner() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -37,7 +39,7 @@ export default function FestivalPlanner() {
       )}
       
       {step === 3 && (
-        <Timetable 
+        <TimetableStep 
           favorites={favorites} 
           activityPrefs={activityPrefs}
           onBack={() => setStep(2)} 
@@ -212,151 +214,80 @@ function RecommendationGrid({ favorites, activityPrefs, onNext, onBack }: {
 }
 
 // Timetable View
-function Timetable({ favorites, activityPrefs, onBack }: {
-  favorites: string[]; activityPrefs: ActivityPref[]; onBack: () => void
+function TimetableStep({ 
+  favorites, 
+  activityPrefs, 
+  onBack 
+}: { 
+  favorites: string[]; 
+  activityPrefs: ActivityPref[]; 
+  onBack: () => void;
 }) {
-  const [schedule, setSchedule] = useState<EventSlot[]>([]);
-  const [shareSlug, setShareSlug] = useState<string>('');
+  const [scheduleData, setScheduleData] = useState<{ events: EventSlot[]; slug: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     api.generateSchedule(favorites, activityPrefs)
       .then((data) => {
-        setSchedule(data.events); // Extract the event slots list
-        setShareSlug(data.slug);   // Store the unique hash slug
+        setScheduleData(data);
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        console.error("Failed to generate schedule:", err);
+      })
+      .finally(() => {
+        setLoading(false); // Loading turns off on success OR error
+      });
   }, [favorites, activityPrefs]);
+
+  const handleCopyUrl = async () => {
+    if (!scheduleData?.slug) return;
+    const url = `${window.location.origin}/schedule/${scheduleData.slug}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <button onClick={onBack} className="text-gray-500 hover:text-black font-medium">← Back</button>
+          <h2 className="text-xl font-bold">Your Optimized Schedule</h2>
+        </div>
+        <p className="text-center py-10 animate-pulse">Solving constraints & travel matrix...</p>
+      </div>
+    );
+  }
+
+  if (!scheduleData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <button onClick={onBack} className="text-gray-500 hover:text-black font-medium">← Back</button>
+          <h2 className="text-xl font-bold">Your Optimized Schedule</h2>
+        </div>
+        <p className="text-red-600">Failed to generate schedule. Please try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <button onClick={onBack} className="text-gray-500 hover:text-black font-medium">← Back</button>
-        <h2 className="text-xl font-bold">Your Optimized Schedule</h2>
-      </div>
-
-      {loading ? (
-        <p className="text-center py-10 animate-pulse">Solving constraints & travel matrix...</p>
-      ) : (
-        <div className="space-y-4">
-          {schedule.map((slot: EventSlot, index: number) => {
-            const isPerformance = slot.event_type === "performance";
-            const isAnnouncement = slot.category === "announcement";
-
-            let cardStyle = "bg-white border-gray-200";
-            let sidebarStyle = "bg-slate-800 text-white";
-            let badgeStyle = "bg-blue-100 text-blue-800";
-            let badgeText = "Music Set";
-
-            if (isAnnouncement) {
-              cardStyle = "bg-amber-50 border-amber-200";
-              sidebarStyle = "bg-amber-800 text-amber-100";
-              badgeStyle = "bg-amber-200 text-amber-900";
-              badgeText = "Announcement";
-            } else if (!isPerformance) {
-              cardStyle = "bg-emerald-50 border-emerald-200";
-              sidebarStyle = "bg-emerald-800 text-emerald-100";
-              badgeStyle = "bg-emerald-200 text-emerald-800";
-              badgeText = slot.category || "Activity";
-            }
-
-            const dateInfo = getFestivalDayInfo(slot.start_time);
-            const isNewDay = index === 0 || getFestivalDayInfo(schedule[index - 1].start_time).rawDate !== dateInfo.rawDate;
-
-            const nextSlot = index < schedule.length - 1 ? schedule[index + 1] : null;
-            const isNextAnnouncement = nextSlot && nextSlot.category === "announcement";
-            const isNextLocationNonActionable = nextSlot && (
-              !nextSlot.location_name ||
-              nextSlot.location_name === "All" ||
-              nextSlot.location_name === "All Locations" ||
-              nextSlot.location_name === "Shipwide / Informational"
-            );
-            
-            // Only show "Next up: Travel" if there isn't a massive gap
-            let gapMinutes = 0;
-            let showFreeTimeBlock = false;
-
-            if (nextSlot) {
-              const currentEndTime = new Date(slot.end_time).getTime();
-              const nextStartTime = new Date(nextSlot.start_time).getTime();
-              gapMinutes = Math.round((nextStartTime - currentEndTime) / 60000);
-              
-              const nextDateInfo = getFestivalDayInfo(nextSlot.start_time);
-
-              // Inject a Free Time block if the gap is >= 30 mins AND it's on the same festival day
-              if (gapMinutes >= 30 && dateInfo.rawDate === nextDateInfo.rawDate) {
-                showFreeTimeBlock = true;
-              }
-            }
-
-            const showTravelLine = nextSlot && !isNextAnnouncement && !isNextLocationNonActionable && !showFreeTimeBlock;
-
-            return (
-              <div key={slot.id || index}>
-                {isNewDay && (
-                  <div className="pt-6 pb-2 border-b-2 border-indigo-500 mb-4 flex items-center justify-between">
-                    <h3 className="text-xl font-extrabold text-indigo-900">
-                      Day {dateInfo.dayNum} — {dateInfo.label}
-                    </h3>
-                  </div>
-                )}
-
-                <div className={`flex rounded-lg border shadow-sm overflow-hidden mb-3 ${cardStyle}`}>
-                  <div className={`p-4 w-36 flex flex-col justify-center items-center shrink-0 ${sidebarStyle}`}>
-                    <span className="font-bold text-sm">{formatTimeET(slot.start_time)}</span>
-                    <span className="text-xs opacity-75">to {formatTimeET(slot.end_time)}</span>
-                  </div>
-
-                  <div className="p-4 flex-grow flex justify-between items-center">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-lg text-gray-900">
-                          {slot.title}
-                        </h3>
-                        <span className={`text-xs px-2 py-0.5 rounded font-semibold ${badgeStyle}`}>
-                          {badgeText}
-                        </span>
-                      </div>
-
-                      <p className="text-sm text-gray-600">
-                        {slot.stage_name && slot.stage_name !== "n/a" ? `${slot.stage_name} • ` : ""}
-                        <span className="font-medium">{slot.location_name}</span>
-                      </p>
-
-                      {showTravelLine && (
-                        <p className="text-xs text-amber-600 mt-2 font-medium">
-                          Next up: Travel to {nextSlot.location_name}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Injected Free Time Block */}
-                {showFreeTimeBlock && (
-                  <div className="flex rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 mb-3 overflow-hidden opacity-80">
-                    <div className="p-4 w-36 flex flex-col justify-center items-center shrink-0 text-gray-500">
-                      <span className="font-bold text-sm">{formatTimeET(slot.end_time)}</span>
-                      <span className="text-xs">to {formatTimeET(nextSlot!.start_time)}</span>
-                    </div>
-                    <div className="p-4 flex-grow flex items-center">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-500 font-semibold italic">Free Time</span>
-                        <span className="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
-                          {gapMinutes >= 60 
-                            ? `${Math.floor(gapMinutes / 60)} hr ${gapMinutes % 60} min` 
-                            : `${gapMinutes} min`}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <Timetable
+        schedule={scheduleData.events}
+        loading={false}
+        title="Your Optimized Schedule"
+        showBackButton={false}
+        shareUrl={`${window.location.origin}/schedule/${scheduleData.slug}`}
+        onCopyShare={handleCopyUrl}
+        copied={copied}
+      />
     </div>
   );
 }

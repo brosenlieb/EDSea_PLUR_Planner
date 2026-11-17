@@ -19,7 +19,7 @@
 
 - **Frontend:** React / Next.js / TailwindCSS
 - **Backend:** Python / FastAPI / PostgreSQL / Google OR Tools
-- **Hosting / Deployment:** Docker / TBD
+- **Hosting / Deployment:** Docker / AWS ECS & Fargate / GitHub Actions
 
 ---
 
