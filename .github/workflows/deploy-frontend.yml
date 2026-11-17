@@ -49,6 +49,6 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster default \
-            --service plur-planner-frontend \
+            --service plur-planner-frontend-d73d \
             --force-new-deployment \
             --region us-east-1
