@@ -33,27 +33,17 @@ def to_eastern(dt: Optional[datetime]) -> Optional[datetime]:
             datetimes are assumed to be in UTC.
 
     Returns:
-        The converted datetime in Eastern Time. If the resulting time is
-        between 12:00 AM and 5:59 AM ET, it is shifted forward by one day
-        for chronological solver sorting.
+        The converted datetime in Eastern Time.
     """
     if dt is None:
         return None
-        
+
     # If naive, assume UTC from the database
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
-        
-    # Convert UTC hours to true Eastern Time hours (e.g., 20:30 UTC -> 16:30 EDT)
-    dt_eastern = dt.astimezone(EASTERN_TZ)
-    
-    # If the event is between 12:00 AM and 5:59 AM ET, shift it
-    # for chronological solver sorting if required by your pipeline
-    if dt_eastern.hour < 6:
-        dt_eastern += timedelta(days=1)
 
-    return dt_eastern
-
+    # Convert UTC to true Eastern Time (handles EDT -> EST transitions automatically)
+    return dt.astimezone(EASTERN_TZ)
 
 def get_location_name(entity: Any, default: str) -> str:
     """Extracts the location name from an entity object, returning a default value if not found.
