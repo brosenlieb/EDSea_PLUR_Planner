@@ -195,7 +195,7 @@ def generate_schedule(
 
     full_schedule.sort(key=get_start_key)
 
-    # 4. Save the new solved schedule into the database cache
+    # Save the new solved schedule into the database cache
     new_slug = secrets.token_urlsafe(6)[:8]
     schedule_json_data = jsonable_encoder(full_schedule)
     
