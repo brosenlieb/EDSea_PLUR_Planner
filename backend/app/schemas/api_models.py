@@ -120,6 +120,7 @@ class EventSlot(BaseModel):
     location_id: int | None = None
     location_name: str = "All Locations"
     stage_name: Optional[str] = "n/a"
+    next_location_walking_minutes: Optional[int] = None
     
     # Performance-specific fields
     artist_ids: Optional[list[int]] = None

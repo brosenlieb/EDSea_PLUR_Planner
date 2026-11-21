@@ -38,4 +38,5 @@ export interface EventSlot {
   artist_ids?: number[];
   category?: string;
   priority?: 'must_have' | 'nice_to_have';
+  next_location_walking_minutes?: number | null;
 }

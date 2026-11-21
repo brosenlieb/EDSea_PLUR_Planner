@@ -100,40 +100,70 @@ export default function Timetable({
           }
 
           const dateInfo = getFestivalDayInfo(slot.start_time);
-          const isNewDay = index === 0 || getFestivalDayInfo(schedule[index - 1].start_time).rawDate !== dateInfo.rawDate;
+          const isNewDay =
+            index === 0 ||
+            getFestivalDayInfo(schedule[index - 1].start_time).rawDate !== dateInfo.rawDate;
 
-          const nextSlot = index < schedule.length - 1 ? schedule[index + 1] : null;
-          const isNextAnnouncement = nextSlot && nextSlot.category === "announcement";
-          const isNextLocationNonActionable = nextSlot && (
-            !nextSlot.location_name ||
-            nextSlot.location_name === "All" ||
-            nextSlot.location_name === "All Locations" ||
-            nextSlot.location_name === "Shipwide / Informational"
-          );
-          
+          // Immediate next slot (used only for calculating Free Time gaps)
+          const immediateNextSlot =
+            index < schedule.length - 1 ? schedule[index + 1] : null;
+
           let gapMinutes = 0;
           let showFreeTimeBlock = false;
 
-          if (nextSlot) {
-            // Force ISO parse consistency across environments
-            const parseIso = (str: string) => {
-              if (!str) return 0;
-              const hasOffset = str.includes("Z") || str.includes("+") || (str.includes("-") && str.length > 19);
-              return new Date(hasOffset ? str : `${str}Z`).getTime();
-            };
-
-            const currentEndTime = parseIso(slot.end_time);
-            const nextStartTime = parseIso(nextSlot.start_time);
+          if (immediateNextSlot) {
+            const currentEndTime = new Date(slot.end_time).getTime();
+            const nextStartTime = new Date(immediateNextSlot.start_time).getTime();
             gapMinutes = Math.round((nextStartTime - currentEndTime) / 60000);
-            
-            const nextDateInfo = getFestivalDayInfo(nextSlot.start_time);
 
-            if (gapMinutes >= 30 && dateInfo.rawDate === nextDateInfo.rawDate) {
+            const immediateNextDateInfo = getFestivalDayInfo(immediateNextSlot.start_time);
+
+            if (gapMinutes >= 30 && dateInfo.rawDate === immediateNextDateInfo.rawDate) {
               showFreeTimeBlock = true;
             }
           }
 
-          const showTravelLine = nextSlot && !isNextAnnouncement && !isNextLocationNonActionable && !showFreeTimeBlock;
+          // Next actionable performance or activity (skipping announcements)
+          const nonActionableLocations = new Set([
+            "",
+            "All",
+            "All Locations",
+            "Shipwide / Informational",
+          ]);
+
+          let nextActionableSlot: EventSlot | null = null;
+          if (!isAnnouncement) {
+            for (let j = index + 1; j < schedule.length; j++) {
+              const candidate = schedule[j];
+              if (candidate.category === "announcement") continue;
+              if (!candidate.location_name || nonActionableLocations.has(candidate.location_name)) {
+                continue;
+              }
+              nextActionableSlot = candidate;
+              break;
+            }
+          }
+
+          // Only show "Next Up" if there is another performance/activity on the SAME festival day
+          const isSameFestivalDay =
+            nextActionableSlot !== null &&
+            getFestivalDayInfo(nextActionableSlot.start_time).rawDate === dateInfo.rawDate;
+
+          const showTravelLine = !isAnnouncement && nextActionableSlot !== null && isSameFestivalDay;
+
+          const walkingMinutes = slot.next_location_walking_minutes;
+          let nextUpText = "";
+
+          if (showTravelLine && nextActionableSlot) {
+            if (walkingMinutes === 0) {
+              nextUpText = `Next Up: Stay at ${nextActionableSlot.location_name} (same location).`;
+            } else if (typeof walkingMinutes === "number") {
+              const unit = walkingMinutes === 1 ? "minute" : "minutes";
+              nextUpText = `Next Up, walk to ${nextActionableSlot.location_name}. If you walk straight there, it'll take about ${walkingMinutes} ${unit}.`;
+            } else {
+              nextUpText = `Next Up, walk to ${nextActionableSlot.location_name}.`;
+            }
+          }
 
           return (
             <div key={slot.id || index}>
@@ -169,7 +199,7 @@ export default function Timetable({
 
                     {showTravelLine && (
                       <p className="text-xs text-amber-600 mt-2 font-medium">
-                        Next up: Travel to {nextSlot.location_name}
+                        {nextUpText}
                       </p>
                     )}
                   </div>
@@ -180,7 +210,7 @@ export default function Timetable({
                 <div className="flex rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 mb-3 overflow-hidden opacity-80">
                   <div className="p-4 w-36 flex flex-col justify-center items-center shrink-0 text-gray-500">
                     <span className="font-bold text-sm">{formatTimeET(slot.end_time)}</span>
-                    <span className="text-xs">to {formatTimeET(nextSlot!.start_time)}</span>
+                    <span className="text-xs">to {formatTimeET(immediateNextSlot!.start_time)}</span>
                   </div>
                   <div className="p-4 flex-grow flex items-center">
                     <div className="flex items-center gap-2">

@@ -1,13 +1,14 @@
 import hashlib
 import json
 import secrets
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Tuple, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session, joinedload, selectinload
+from sqlalchemy import text
 from zoneinfo import ZoneInfo
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from app.api.deps import get_db
 from app.core.recommendation import get_recommendations
@@ -194,6 +195,7 @@ def generate_schedule(
         return st.isoformat() if hasattr(st, 'isoformat') else str(st)
 
     full_schedule.sort(key=get_start_key)
+    full_schedule = attach_walking_times(full_schedule, db)
 
     # Save the new solved schedule into the database cache
     new_slug = secrets.token_urlsafe(6)[:8]
@@ -208,3 +210,77 @@ def generate_schedule(
     )
     
     return {"slug": new_slug, "events": full_schedule}
+
+def get_distance_lookup(db: Session) -> Dict[Tuple[int, int], int]:
+    """Loads all location-to-location walking times into memory."""
+    # Adjust column names if your schema uses e.g. source_location_id / target_location_id / minutes
+    rows = db.execute(
+        text("""
+            SELECT location_a, location_b, distance_minutes
+            FROM location_distances
+        """)
+    ).fetchall()
+
+    lookup: Dict[Tuple[int, int], int] = {}
+    for from_id, to_id, minutes in rows:
+        lookup[(from_id, to_id)] = minutes
+        # Fallback in case location_distances only stores one direction per pair
+        if (to_id, from_id) not in lookup:
+            lookup[(to_id, from_id)] = minutes
+
+    return lookup
+
+def attach_walking_times(schedule_slots: List[dict], db: Session) -> List[dict]:
+    """
+    Populates `next_location_walking_minutes` on each performance and activity
+    by looking ahead to the next non-announcement event on the same festival day.
+    """
+    if not schedule_slots:
+        return schedule_slots
+
+    # Ensure chronological order before scanning ahead
+    sorted_slots = sorted(schedule_slots, key=lambda s: s["start_time"])
+    distance_lookup = get_distance_lookup(db)
+
+    non_actionable_locations = {None, "", "All", "All Locations", "Shipwide / Informational"}
+
+    for i, current in enumerate(sorted_slots):
+        current["next_location_walking_minutes"] = None
+
+        # Only performances and activities get a "Next Up" prompt (skip announcements)
+        if current.get("category") == "announcement":
+            continue
+
+        current_festival_day = current["start_time"].date()
+
+        # Scan forward to find the next actionable performance or activity
+        next_actionable = None
+        for j in range(i + 1, len(sorted_slots)):
+            candidate = sorted_slots[j]
+            if candidate.get("category") == "announcement":
+                continue
+            if candidate.get("location_name") in non_actionable_locations:
+                continue
+            next_actionable = candidate
+            break
+
+        if not next_actionable:
+            continue
+
+        # Skip if the next event is on a different festival day (current is final event of the day)
+        next_festival_day = next_actionable["start_time"].date()
+        if next_festival_day != current_festival_day:
+            continue
+
+        from_loc_id = current.get("location_id")
+        to_loc_id = next_actionable.get("location_id")
+
+        if from_loc_id is not None and to_loc_id is not None:
+            if from_loc_id == to_loc_id:
+                current["next_location_walking_minutes"] = 0
+            else:
+                current["next_location_walking_minutes"] = distance_lookup.get(
+                    (from_loc_id, to_loc_id)
+                )
+
+    return sorted_slots
