@@ -211,9 +211,8 @@ def generate_schedule(
     
     return {"slug": new_slug, "events": full_schedule}
 
-def get_distance_lookup(db: Session) -> Dict[Tuple[int, int], int]:
+def get_distance_lookup(db: Session) -> Dict[Tuple[str, str], int]:
     """Loads all location-to-location walking times into memory."""
-    # Adjust column names if your schema uses e.g. source_location_id / target_location_id / minutes
     rows = db.execute(
         text("""
             SELECT location_a, location_b, distance_minutes
@@ -221,12 +220,12 @@ def get_distance_lookup(db: Session) -> Dict[Tuple[int, int], int]:
         """)
     ).fetchall()
 
-    lookup: Dict[Tuple[int, int], int] = {}
-    for from_id, to_id, minutes in rows:
-        lookup[(from_id, to_id)] = minutes
+    lookup: Dict[Tuple[str, str], int] = {}
+    for from_name, to_name, minutes in rows:
+        lookup[(from_name, to_name)] = minutes
         # Fallback in case location_distances only stores one direction per pair
-        if (to_id, from_id) not in lookup:
-            lookup[(to_id, from_id)] = minutes
+        if (to_name, from_name) not in lookup:
+            lookup[(to_name, from_name)] = minutes
 
     return lookup
 
@@ -272,15 +271,15 @@ def attach_walking_times(schedule_slots: List[dict], db: Session) -> List[dict]:
         if next_festival_day != current_festival_day:
             continue
 
-        from_loc_id = current.get("location_id")
-        to_loc_id = next_actionable.get("location_id")
+        from_loc_name = current.get("location_name")
+        to_loc_name = next_actionable.get("location_name")
 
-        if from_loc_id is not None and to_loc_id is not None:
-            if from_loc_id == to_loc_id:
+        if from_loc_name and to_loc_name:
+            if from_loc_name == to_loc_name:
                 current["next_location_walking_minutes"] = 0
             else:
                 current["next_location_walking_minutes"] = distance_lookup.get(
-                    (from_loc_id, to_loc_id)
+                    (from_loc_name, to_loc_name)
                 )
 
     return sorted_slots
